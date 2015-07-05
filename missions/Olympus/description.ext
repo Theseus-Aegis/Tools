@@ -1,0 +1,24 @@
+enableDebugConsole = 1; // Enables Debug Console in Pause menu (1 = Hosts and Admins)
+disabledAI = 1;
+
+respawn = "BASE";
+
+class CfgFunctions {
+  #include "USEC\functions.h"
+};
+
+
+// Author
+author = "Unity Security Force";
+
+// Mission name
+briefingName = "Unity Training Grounds"; // in mission select menu
+onLoadName = "Unity Training Grounds"; // on load screen
+
+// Picture shown
+overviewPicture = "UTGloading.paa"; // in mission select menu
+loadScreen = "UTGloading.paa"; // on load screen
+
+// Mission description
+overviewText = "USEC Training facilities."; // in mission select menu
+onLoadMission = "USEC Training facilities."; // on load screen
