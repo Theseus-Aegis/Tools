@@ -58,3 +58,6 @@ texHeaders.bin
 
 # SQM
 *.sqm
+
+# Tools temporary files
+tools/temp
