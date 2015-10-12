@@ -15,13 +15,11 @@ OUTPUT = "temp\\compatibleMagazines_OUPUT.txt"
 SQL_DBTABLE = "apollo.ammotypes"
 ##########################
 
-
 def writeToFile(weapon, magazines):
     # Write SQL statements to output file
     with open(OUTPUT, "a") as file:
         for magazine in magazines:
             file.write("INSERT INTO {} (weaponClass, ammoClass) VALUES ('{}', '{}');\n".format(SQL_DBTABLE, weapon, magazine))
-
 
 def main():
     # Check for input file
