@@ -17,26 +17,26 @@
 
 params [["_type", 0]];
 
-local _data = []; // [ [weapon, [items]], [weapon, [items] ]
+private _data = []; // [ [weapon, [items]], [weapon, [items] ]
 
-local _config = configFile >> "CfgWeapons";
+private _config = configFile >> "CfgWeapons";
 
 for "_i" from 0 to count _config - 1 do {
-    local _weapon = _config select _i;
-    local _weaponClassname = configName _weapon;
+    private _weapon = _config select _i;
+    private _weaponClassname = configName _weapon;
 
     // Weapon checks
-    local _hasLinkedItems = isClass (_weapon >> "LinkedItems"); // Exclude linked items (weapons with preset attachments)
-    local _isPublicScope = getNumber (_weapon >> "scope") == 2; // Only scope 2 (public) weapons
-    local _isWantedWeaponType = getNumber (_weapon >> "type") in [1, 2, 4, 2^12]; // Only primary (1), handguns (2), secondaries (4) and binoculars (4096)
+    private _hasLinkedItems = isClass (_weapon >> "LinkedItems"); // Exclude linked items (weapons with preset attachments)
+    private _isPublicScope = getNumber (_weapon >> "scope") == 2; // Only scope 2 (public) weapons
+    private _isWantedWeaponType = getNumber (_weapon >> "type") in [1, 2, 4, 2^12]; // Only primary (1), handguns (2), secondaries (4) and binoculars (4096)
 
     // Compatible Magazines check
-    local _magazines = getArray (_weapon >> "magazines");
-    local _hasMagazines = !(_magazines isEqualTo []); // Exclude weapons without compatible magazines
+    private _magazines = getArray (_weapon >> "magazines");
+    private _hasMagazines = !(_magazines isEqualTo []); // Exclude weapons without compatible magazines
 
     // Compatible Attachments check
-    local _attachments = [_weaponClassname] call CBA_fnc_compatibleItems;
-    local _hasAttachments = !(_attachments isEqualTo []); // Exclude weapons without compatible attachments
+    private _attachments = [_weaponClassname] call CBA_fnc_compatibleItems;
+    private _hasAttachments = !(_attachments isEqualTo []); // Exclude weapons without compatible attachments
 
     // Add to data
     if (!_hasLinkedItems && _isPublicScope && _isWantedWeaponType) then {
