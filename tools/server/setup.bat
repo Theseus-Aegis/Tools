@@ -7,21 +7,21 @@ rem properly setup Arma 3 Server installation and all files listed in STATIC VAR
 
 rem STATIC VARIABLES
 rem Arma 3 Steam
-set a3server="C:\Steam\steamapps\common\Arma 3 Server"
-    set symA3dirs=(addons battleye curator dll dta heli kart mark)
-    set symA3files=(arma3server.exe arma3server_readme.txt ijl15.dll msvcr100 physx3_x86.dll physx3common_x86.dll physx3cooking_x86.dll physx3gpu_x86.dll steam.dll steam_api.dll steam_appid.txt steamclient.dll tier0_s.dll vstdlib_s.dll)
-    set symTACdirs=(keys tac_maps tac_mods tac_packs tac_server userconfig)
+set a3server="C:\SteamCMD\steamapps\common\Arma 3 Server"
+    set symA3dirs=(addons curator dll dta heli kart mark)
+    set symA3files=(arma3server.exe arma3server_readme.txt ijl15.dll msvcr100.dll physx3_x86.dll physx3common_x86.dll physx3cooking_x86.dll physx3gpu_x86.dll steam.dll steam_api.dll steam_appid.txt steamclient.dll tier0_s.dll vstdlib_s.dll)
+    set symTACdirs=(keys tac_core tac_server userconfig)
     set symTACfiles=()
         rem basic.cfg
     set cpyA3dirs=(mpmissions)
         rem profiles
     set cpyA3files=(server.cfg)
 rem Custom servers
-set serversFolder=C:\TAC\Arma 3
+set serversFolder=C:\Theseus\Arma 3\Servers
 rem Mod line
-set mods=(tac_maps tac_mods tac_packs)
+set mods=(tac_core)
 set serverMods=(tac_server)
-set modsPreload=(tac_mods\@CBA_A3 tac_mods\@ace tac_mods\@tac_mods)
+set modsPreload=(tac_core\@CBA_A3 tac_core\@ace tac_core\@tac_mods)
 set headlessServerMods=()
 
 cd %serversFolder%
@@ -129,8 +129,8 @@ nssm install "Arma 3 %server%" "%serversFolder%\%server%\arma3server.exe" -exThr
 nssm set "Arma 3 %server%" Description Arma 3 Server - %server% - Theseus Inc. (runs through nssm)
 nssm set "Arma 3 %server%" Start SERVICE_DELAYED_AUTO_START
 nssm set "Arma 3 %server%" Type SERVICE_INTERACTIVE_PROCESS
-nssm set "Arma 3 %server%" AppStdout C:\TAC\Arma 3\%server%\profiles\service.log
-nssm set "Arma 3 %server%" AppStderr C:\TAC\Arma 3\%server%\profiles\service.log
+nssm set "Arma 3 %server%" AppStdout %serversFolder%\%server%\profiles\service.log
+nssm set "Arma 3 %server%" AppStderr %serversFolder%\%server%\profiles\service.log
 
 
 rem Parameters file
@@ -138,13 +138,13 @@ echo.
 echo Creating startup parameters file...
 echo -----------------------------
 echo -port=%port%> params.cfg
-rem echo -cfg=basic.cfg>> params.cfg
-rem echo -name=Theseus>> params.cfg
 echo -mod=%modsCore%>> params.cfg
 if %type%==server (
     echo -serverMod=%serverModsCore%>> params.cfg
     echo -config=server.cfg>> params.cfg
     echo -loadMissionToMemory>>params.cfg
+    rem temp
+    echo -filePatching>>params.cfg
 ) else (
     echo -client>>params.cfg
     echo -connect=localhost>>params.cfg

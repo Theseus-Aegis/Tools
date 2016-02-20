@@ -3,11 +3,11 @@ setlocal EnableDelayedExpansion
 
 rem STATIC VARIABLES
 rem Custom servers
-set serversFolder="C:\TAC\Arma 3"
+set serversFolder="C:\Theseus\Arma 3\Servers"
 rem Mod line
-set mods=(tac_maps tac_mods tac_packs)
+set mods=(tac_core)
 set serverMods=(tac_server)
-set modsPreload=(tac_mods\@CBA_A3 tac_mods\@ace tac_mods\@tac_mods)
+set modsPreload=(tac_core\@CBA_A3 tac_core\@ace tac_core\@tac_mods)
 set headlessServerMods=()
 
 cd %serversFolder%
@@ -90,6 +90,8 @@ if %type%==server (
     echo -serverMod=%serverModsCore%>> params.cfg
     echo -config=server.cfg>> params.cfg
     echo -loadMissionToMemory>>params.cfg
+    rem temp
+    echo -filePatching>>params.cfg
 ) else (
     echo -client>>params.cfg
     echo -connect=localhost>>params.cfg
