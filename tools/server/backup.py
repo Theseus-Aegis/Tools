@@ -19,6 +19,8 @@ MYSQLDUMP_PATH = "C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin"
 ITEMS = ["Arma 3\\Missions Archive", "Arma 3\\Modpack\\development", "Athena", "TeamSpeak 3 Server", "www\\drupal", "www\\resources", "www\\webmail", "files_changed.txt"]
 ARMA_SERVER_ITEMS = ["Apollo", "mpmissions", "apollo.properties", "jni.conf", "jni.dll", "params.cfg", "server.cfg"]
 DATABASES = ["apollo", "apollo_test", "drupal", "hmaildb"]
+# OTHER
+BACKUPS_TO_KEEP = 50
 ##########################
 
 def remove_readonly(function, path, exc):
@@ -170,7 +172,7 @@ def main():
         # Remove oldest backup when there is more than 10
         ftp.cwd("..")
         folders = ftp.nlst()
-        if len(folders) > 10 + 3: # 3 = [".", "..", ".banner"]
+        if len(folders) > BACKUPS_TO_KEEP + 3: # 3 = [".", "..", ".banner"]
             for folder in folders:
                 if folder.startswith("2"):
                     print("- Removing old backup: {}".format(folder))
