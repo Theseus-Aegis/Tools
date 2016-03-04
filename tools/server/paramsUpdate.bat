@@ -83,15 +83,11 @@ echo.
 echo Creating startup parameters file...
 echo -----------------------------
 echo -port=%port%> params.cfg
-rem echo -cfg=basic.cfg>> params.cfg
-rem echo -name=Theseus>> params.cfg
 echo -mod=%modsCore%>> params.cfg
 if %type%==server (
     echo -serverMod=%serverModsCore%>> params.cfg
     echo -config=server.cfg>> params.cfg
     echo -loadMissionToMemory>>params.cfg
-    rem temp
-    echo -filePatching>>params.cfg
 ) else (
     echo -client>>params.cfg
     echo -connect=localhost>>params.cfg

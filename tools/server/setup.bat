@@ -143,8 +143,6 @@ if %type%==server (
     echo -serverMod=%serverModsCore%>> params.cfg
     echo -config=server.cfg>> params.cfg
     echo -loadMissionToMemory>>params.cfg
-    rem temp
-    echo -filePatching>>params.cfg
 ) else (
     echo -client>>params.cfg
     echo -connect=localhost>>params.cfg
