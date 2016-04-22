@@ -1,24 +1,35 @@
-enableDebugConsole = 1; // Enables Debug Console in Pause menu (1 = Hosts and Admins)
-disabledAI = 1;
-
-respawn = "BASE";
-
 class CfgFunctions {
-  #include "USEC\functions.h"
+    class TAC_Olympus {
+        class functions {
+            file = "functions";
+            class constantShoot;
+            class medicalExercise;
+            class VAboxMarksmaninit;
+            class VAboxMGinit;
+            class VAboxPistolSMGinit;
+            class VAboxRifleinit;
+            class BasicLoadout;
+            class billBoards;
+            class VAboxLockersinit;
+            class VAboxStaginginit;
+        };
+    };
 };
 
-
 // Author
-author = "Unity Security Force";
+author = "Theseus Incorporated";
 
 // Mission name
-briefingName = "Unity Training Grounds"; // in mission select menu
-onLoadName = "Unity Training Grounds"; // on load screen
+briefingName = "Olympus"; // in mission select menu
+onLoadName = "Olympus"; // on load screen
 
 // Picture shown
-overviewPicture = "UTGloading.paa"; // in mission select menu
-loadScreen = "UTGloading.paa"; // on load screen
+overviewPicture = "\x\tac\addons\resources\Olympus\loading.paa"; // in mission select menu
+loadScreen = "\x\tac\addons\resources\Olympus\loading.paa"; // on load screen
 
 // Mission description
-overviewText = "USEC Training facilities."; // in mission select menu
-onLoadMission = "USEC Training facilities."; // on load screen
+overviewText = "Olympus Training Facilities"; // in mission select menu
+onLoadMission = "Olympus Training Facilities"; // on load screen
+
+
+disabledAI = 1;
