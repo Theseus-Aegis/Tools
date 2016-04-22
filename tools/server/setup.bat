@@ -12,9 +12,9 @@ set a3server="C:\SteamCMD\steamapps\common\Arma 3 Server"
     set symA3files=(arma3server.exe arma3server_readme.txt ijl15.dll msvcr100.dll physx3_x86.dll physx3common_x86.dll physx3cooking_x86.dll physx3gpu_x86.dll steam.dll steam_api.dll steam_appid.txt steamclient.dll tier0_s.dll vstdlib_s.dll)
     set symTACdirs=(keys tac_core tac_server userconfig)
     set symTACfiles=()
-        rem basic.cfg
+    rem basic.cfg
     set cpyA3dirs=(mpmissions)
-        rem profiles
+    rem profiles
     set cpyA3files=(server.cfg)
 rem Custom servers
 set serversFolder=C:\Theseus\Arma 3\Servers
