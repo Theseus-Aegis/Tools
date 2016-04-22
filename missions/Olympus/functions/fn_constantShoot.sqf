@@ -1,3 +1,21 @@
+/*
+ * Author: Jonpas, Rory
+ * Makes an AI shoot into a target periodically as long as a player is in the trigger.
+ * Called from Trigger activation.
+ *
+ * Arguments:
+ * 0: AI Shooter <OBJECT>
+ * 1: Target <OBJECT>
+ * 2: Units in trigger (thisList) <ARRAY>
+ *
+ * Return Value:
+ * None
+ *
+ * Example:
+ * [shooter, target, thisList] call TAC_Olympus_fnc_constantShoot
+ */
+#include "..\script_component.hpp"
+
 params ["_shooter", "_target", "_thisList"];
 
 private _weapon = (weaponState _shooter) select 1;

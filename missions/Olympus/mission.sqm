@@ -8,7 +8,7 @@ class EditorData
 	toggles=1;
 	class ItemIDProvider
 	{
-		nextID=2886;
+		nextID=2888;
 	};
 	class MarkerIDProvider
 	{
@@ -16,10 +16,10 @@ class EditorData
 	};
 	class Camera
 	{
-		pos[]={6577.9575,32.699188,5330.6602};
-		dir[]={0.44468638,-0.45823285,-0.76975697};
-		up[]={0.22928016,0.88871473,-0.39687964};
-		aside[]={-0.86601704,-1.9990839e-006,-0.50029993};
+		pos[]={6458.6519,23.563616,5335.0996};
+		dir[]={0.21184036,-0.48933339,0.84609532};
+		up[]={0.11885551,0.87207037,0.47471052};
+		aside[]={0.97016239,-7.6455763e-008,-0.24289937};
 	};
 };
 binarizationWanted=0;
@@ -164,7 +164,6 @@ class Mission
 			};
 			id=5;
 			type="MapBoard_stratis_F";
-			atlOffset=0.00094032288;
 		};
 		class Item1
 		{
@@ -182,7 +181,7 @@ class Mission
 			};
 			id=8;
 			type="Land_MapBoard_F";
-			atlOffset=0.0061531067;
+			atlOffset=0.00043773651;
 			class CustomAttributes
 			{
 				class Attribute0
@@ -222,7 +221,7 @@ class Mission
 			};
 			id=20;
 			type="Land_WaterCooler_01_new_F";
-			atlOffset=1.7166138e-005;
+			atlOffset=0.043816566;
 		};
 		class Item3
 		{
@@ -256,7 +255,6 @@ class Mission
 			};
 			id=28;
 			type="Land_CampingChair_V2_F";
-			atlOffset=1.1444092e-005;
 		};
 		class Item5
 		{
@@ -273,7 +271,7 @@ class Mission
 			};
 			id=31;
 			type="Land_CampingChair_V2_F";
-			atlOffset=1.1444092e-005;
+			atlOffset=0.039876461;
 		};
 		class Item6
 		{
@@ -290,7 +288,7 @@ class Mission
 			};
 			id=32;
 			type="Land_CampingChair_V2_F";
-			atlOffset=1.1444092e-005;
+			atlOffset=0.043394089;
 		};
 		class Item7
 		{
@@ -307,7 +305,6 @@ class Mission
 			};
 			id=33;
 			type="Land_CampingChair_V2_F";
-			atlOffset=1.1444092e-005;
 		};
 		class Item8
 		{
@@ -324,7 +321,7 @@ class Mission
 			};
 			id=34;
 			type="Land_CampingTable_small_F";
-			atlOffset=0.047992706;
+			atlOffset=0.047999859;
 			class CustomAttributes
 			{
 				class Attribute0
@@ -17744,7 +17741,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGInit;";
 			};
 			id=1573;
 			type="Land_PlasticCase_01_large_F";
@@ -17862,7 +17859,7 @@ class Mission
 			side="Empty";
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGInit;";
 			};
 			id=1584;
 			type="Land_PlasticCase_01_small_F";
@@ -18206,7 +18203,7 @@ class Mission
 			side="Empty";
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGInit;";
 			};
 			id=1599;
 			type="Land_PlasticCase_01_small_F";
@@ -18500,7 +18497,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGInit;";
 			};
 			id=1611;
 			type="Land_PlasticCase_01_small_F";
@@ -18578,7 +18575,7 @@ class Mission
 			side="Empty";
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGInit;";
 			};
 			id=1612;
 			type="Land_PlasticCase_01_small_F";
@@ -18673,7 +18670,7 @@ class Mission
 			side="Empty";
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGInit;";
 			};
 			id=1614;
 			type="Land_PlasticCase_01_small_F";
@@ -18752,7 +18749,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGInit;";
 			};
 			id=1615;
 			type="Land_PlasticCase_01_small_F";
@@ -18831,7 +18828,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxPistolSMGInit;";
 			};
 			id=1616;
 			type="Land_PlasticCase_01_large_F";
@@ -21670,7 +21667,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxRifleinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxRifleInit;";
 			};
 			id=1856;
 			type="Land_PlasticCase_01_large_F";
@@ -21730,7 +21727,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxRifleinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxRifleInit;";
 			};
 			id=1857;
 			type="Land_PlasticCase_01_large_F";
@@ -21789,7 +21786,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxRifleinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxRifleInit;";
 			};
 			id=1858;
 			type="Land_PlasticCase_01_large_F";
@@ -21848,7 +21845,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxRifleinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxRifleInit;";
 			};
 			id=1859;
 			type="Land_PlasticCase_01_large_F";
@@ -22161,7 +22158,7 @@ class Mission
 			side="Empty";
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxRifleinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxRifleInit;";
 			};
 			id=1883;
 			type="Land_PlasticCase_01_large_F";
@@ -22220,7 +22217,7 @@ class Mission
 			side="Empty";
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxMarksmaninit;";
+				init="[this] call TAC_Olympus_fnc_VAboxMarksmanInit;";
 			};
 			id=1884;
 			type="Land_PlasticCase_01_large_F";
@@ -23999,8 +23996,7 @@ class Mission
 			side="Empty";
 			class Attributes
 			{
-				init="[[victim1, victim2], this, fakeMine, wayPointSphere] call TAC_Olympus_fnc_medicalExercise;";
-				name="medicalController";
+				init="[[victim1, victim2], this, fakeMine, wayPointSphere] call TAC_Olympus_fnc_prepareMedicalExercise;";
 			};
 			id=1977;
 			type="Land_Laptop_device_F";
@@ -27647,16 +27643,17 @@ class Mission
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={6596.1841,24.131502,5347.127};
+				position[]={6592.7329,24.419153,5347.0352};
+				angles[]={6.2706842,0,6.1760979};
 			};
 			side="Empty";
+			flags=4;
 			class Attributes
 			{
 				name="fakeMine";
 			};
 			id=2146;
 			type="APERSMine";
-			atlOffset=0.13599968;
 			class CustomAttributes
 			{
 				class Attribute0
@@ -27684,8 +27681,8 @@ class Mission
 		class Item1160
 		{
 			dataType="Trigger";
-			position[]={6593.8638,24.642056,5343.2393};
-			angle=2.9879723;
+			position[]={6589.875,24.643906,5343.3301};
+			angle=2.9879684;
 			class Attributes
 			{
 				onActivation="fakeMine setDamage 1;";
@@ -27697,7 +27694,7 @@ class Mission
 			};
 			id=2147;
 			type="EmptyDetector";
-			atlOffset=0.39382172;
+			atlOffset=0.00044250488;
 		};
 		class Item1161
 		{
@@ -32860,7 +32857,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxMGinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxMGInit;";
 			};
 			id=2413;
 			type="Land_PlasticCase_01_large_F";
@@ -32920,7 +32917,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxMGinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxMGInit;";
 			};
 			id=2414;
 			type="Land_PlasticCase_01_large_F";
@@ -33186,7 +33183,7 @@ class Mission
 					flags=7;
 					class Attributes
 					{
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Instructor";
 						isPlayable=1;
 					};
@@ -33247,7 +33244,7 @@ class Mission
 					flags=5;
 					class Attributes
 					{
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						name="Contractor";
 						description="Medic Trainee";
 						isPlayable=1;
@@ -33310,7 +33307,7 @@ class Mission
 					flags=5;
 					class Attributes
 					{
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Medic Trainee";
 						isPlayable=1;
 					};
@@ -33372,7 +33369,7 @@ class Mission
 					flags=5;
 					class Attributes
 					{
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Medic Trainee";
 						isPlayable=1;
 					};
@@ -33434,7 +33431,7 @@ class Mission
 					flags=5;
 					class Attributes
 					{
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Medic Trainee";
 						isPlayable=1;
 					};
@@ -33495,7 +33492,7 @@ class Mission
 					flags=5;
 					class Attributes
 					{
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Medic Trainee";
 						isPlayable=1;
 					};
@@ -33556,7 +33553,7 @@ class Mission
 					flags=5;
 					class Attributes
 					{
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Medic Trainee";
 						isPlayable=1;
 					};
@@ -33618,7 +33615,7 @@ class Mission
 					flags=5;
 					class Attributes
 					{
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Medic Trainee";
 						isPlayable=1;
 					};
@@ -33680,7 +33677,7 @@ class Mission
 					flags=5;
 					class Attributes
 					{
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Medic Trainee";
 						isPlayable=1;
 					};
@@ -33902,8 +33899,7 @@ class Mission
 			flags=5;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_billBoards;";
-				name="billboard1";
+				init="[this] call TAC_Olympus_fnc_setBillboard;";
 			};
 			id=2553;
 			type="Land_Billboard_F";
@@ -33937,18 +33933,18 @@ class Mission
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={6053.0439,89.252396,4889.4424};
-				angles[]={0,1.1423703,0};
+				position[]={6019.8335,89.807114,4965.4868};
+				angles[]={0,1.06625,0};
 			};
 			side="Empty";
 			flags=1;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_billBoards;";
+				init="[this] call TAC_Olympus_fnc_setBillboard;";
 			};
 			id=2556;
 			type="Land_Billboard_F";
-			atlOffset=2.3513794;
+			atlOffset=1.0068436;
 			class CustomAttributes
 			{
 				class Attribute0
@@ -34420,7 +34416,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxLockersinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxLockersInit;";
 			};
 			id=2611;
 			type="CUP_A2_case_a";
@@ -34461,7 +34457,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxLockersinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxLockersInit;";
 			};
 			id=2612;
 			type="CUP_A2_case_a";
@@ -34501,7 +34497,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxLockersinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxLockersInit;";
 			};
 			id=2613;
 			type="CUP_A2_case_a";
@@ -34542,7 +34538,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxLockersinit;";
+				init="[this] call TAC_Olympus_fnc_VAboxLockersInit;";
 			};
 			id=2614;
 			type="CUP_A2_case_a";
@@ -36531,21 +36527,22 @@ class Mission
 					dataType="Object";
 					class PositionInfo
 					{
-						position[]={6465.395,8.2294226,5360.3506};
-						angles[]={0,5.6194296,0};
+						position[]={6465.395,8.229126,5360.3506};
+						angles[]={0,5.6194367,0};
 					};
 					side="Independent";
 					flags=7;
 					class Attributes
 					{
 						rank="SERGEANT";
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Instructor";
+						isPlayer=1;
 						isPlayable=1;
 					};
 					id=2801;
 					type="tacs_Unit_I_Contractor_GL";
-					atlOffset=-0.0027036667;
+					atlOffset=-0.0030002594;
 					class CustomAttributes
 					{
 						class Attribute0
@@ -36603,7 +36600,7 @@ class Mission
 					{
 						skill=0.44999999;
 						rank="CORPORAL";
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -36666,7 +36663,7 @@ class Mission
 					class Attributes
 					{
 						skill=0.40000001;
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -36729,7 +36726,7 @@ class Mission
 					class Attributes
 					{
 						skill=0.40000001;
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -36793,7 +36790,7 @@ class Mission
 					{
 						skill=0.44999999;
 						rank="CORPORAL";
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -36855,7 +36852,7 @@ class Mission
 					class Attributes
 					{
 						skill=0.40000001;
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -36917,7 +36914,7 @@ class Mission
 					class Attributes
 					{
 						skill=0.40000001;
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -36972,7 +36969,7 @@ class Mission
 			{
 			};
 			id=2800;
-			atlOffset=-0.0027036667;
+			atlOffset=-0.0030002594;
 		};
 		class Item1518
 		{
@@ -36994,7 +36991,7 @@ class Mission
 					class Attributes
 					{
 						rank="SERGEANT";
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Instructor";
 						isPlayable=1;
 					};
@@ -37057,7 +37054,7 @@ class Mission
 					{
 						skill=0.44999999;
 						rank="CORPORAL";
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -37120,7 +37117,7 @@ class Mission
 					class Attributes
 					{
 						skill=0.40000001;
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -37182,7 +37179,7 @@ class Mission
 					class Attributes
 					{
 						skill=0.40000001;
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -37246,7 +37243,7 @@ class Mission
 					{
 						skill=0.44999999;
 						rank="CORPORAL";
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -37309,7 +37306,7 @@ class Mission
 					class Attributes
 					{
 						skill=0.40000001;
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -37372,7 +37369,7 @@ class Mission
 					class Attributes
 					{
 						skill=0.40000001;
-						init="[this] call TAC_Olympus_fnc_BasicLoadout;";
+						init="[this] call TAC_Olympus_fnc_setBasicLoadout;";
 						description="Trainee";
 						isPlayable=1;
 					};
@@ -37532,7 +37529,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxStaginginit;";
+				init="[this] call TAC_Olympus_fnc_VAboxStagingInit;";
 			};
 			id=2828;
 			type="Land_PlasticCase_01_large_F";
@@ -37592,7 +37589,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxStaginginit;";
+				init="[this] call TAC_Olympus_fnc_VAboxStagingInit;";
 			};
 			id=2829;
 			type="Land_PlasticCase_01_large_F";
@@ -37652,7 +37649,7 @@ class Mission
 			flags=4;
 			class Attributes
 			{
-				init="[this] call TAC_Olympus_fnc_VAboxStaginginit;";
+				init="[this] call TAC_Olympus_fnc_VAboxStagingInit;";
 			};
 			id=2830;
 			type="Land_PlasticCase_01_large_F";

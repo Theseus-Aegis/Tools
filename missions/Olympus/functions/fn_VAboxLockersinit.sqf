@@ -1,3 +1,18 @@
+/*
+ * Author: Rory
+ * Initializes Virtual Arsenal on an object with specific items only.
+ *
+ * Arguments:
+ * 0: Crate <OBJECT>
+ *
+ * Return Value:
+ * None
+ *
+ * Example:
+ * [crate] call TAC_Olympus_fnc_VAboxLockersInit
+ */
+#include "..\script_component.hpp"
+
 //Lists of items to include
 #define AVAILABLE_UNIFORMS [\
     "U_B_HeliPilotCoveralls",\
@@ -249,9 +264,10 @@
 ]
 
 //Init stuff
-private _crate = _this select 0;
-["AmmoboxInit",[_crate,false,{true}]] spawn BIS_fnc_arsenal;
+params ["_crate"];
+
+["AmmoboxInit", [_crate, false, {true}]] spawn BIS_fnc_arsenal;
 
 //Populate with predefined items and whatever is already in the crate
-[_crate,((backpackCargo _crate) + AVAILABLE_BACKPACKS)] call BIS_fnc_addVirtualBackpackCargo;
-[_crate,((itemCargo _crate) + AVAILABLE_HEADGEAR + AVAILABLE_GOGGLES + AVAILABLE_UNIFORMS + AVAILABLE_VESTS)] call BIS_fnc_addVirtualItemCargo;
+[_crate, (backpackCargo _crate) + AVAILABLE_BACKPACKS] call BIS_fnc_addVirtualBackpackCargo;
+[_crate, (itemCargo _crate) + AVAILABLE_HEADGEAR + AVAILABLE_GOGGLES + AVAILABLE_UNIFORMS + AVAILABLE_VESTS] call BIS_fnc_addVirtualItemCargo;
