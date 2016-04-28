@@ -11,16 +11,16 @@ import stat
 
 ######## GLOBALS #########
 # PATHS
-ROOT = "C:\\Theseus"
+ROOT = "C:\\"
 TEMP = "C:\\tmp\\backup"
-ARMA_SERVERS_PATH = "Arma 3\\Servers"
+ARMA_SERVERS_PATH = "Theseus\\Arma 3\\Servers"
 MYSQLDUMP_PATH = "C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin"
 # CONTENTS
-ITEMS = ["Arma 3\\Missions Archive", "Arma 3\\Modpack\\development", "Athena", "TeamSpeak 3 Server", "www\\drupal", "www\\resources", "www\\webmail", "files_changed.txt"]
+ITEMS = ["Apache24", "php", "Program Files (x86)\\hMailServer\\Data", "ProgramData\\MySQL\\MySQL Server 5.7\\Data", "Theseus\\Arma 3\\Missions Archive", "Theseus\\Arma 3\\Modpack\\development", "Theseus\\Athena", "Theseus\\TeamSpeak 3 Server", "Theseus\\www\\drupal", "Theseus\\www\\resources", "Theseus\\www\\webmail", "Theseus\\files_changed.txt"]
 ARMA_SERVER_ITEMS = ["Apollo", "mpmissions", "apollo.properties", "jni.conf", "jni.dll", "params.cfg", "server.cfg"]
 DATABASES = ["apollo", "apollo_test", "drupal", "hmaildb"]
 # OTHER
-BACKUPS_TO_KEEP = 50
+BACKUPS_TO_KEEP = 10
 ##########################
 
 def remove_readonly(function, path, exc):
@@ -31,8 +31,8 @@ def remove_readonly(function, path, exc):
 def main():
     # Parse arguments
     parser = argparse.ArgumentParser(description="Process item type to parse")
-    parser.add_argument("-dbu", "--databseuser", default=False, type=str, required=False, help="database user")
-    parser.add_argument("-dbp", "--databsepassword", default=False, type=str, required=False, help="database password")
+    parser.add_argument("-dbu", "--databaseuser", default=False, type=str, required=False, help="database user")
+    parser.add_argument("-dbp", "--databasepassword", default=False, type=str, required=False, help="database password")
     parser.add_argument("-ftps", "--ftpserver", default=False, type=str, required=False, help="FTP backup server URL")
     parser.add_argument("-ftpu", "--ftpuser", default=False, type=str, required=False, help="FTP backup server user")
     parser.add_argument("-ftpp", "--ftppassword", default=False, type=str, required=False, help="FTP backup server password")
@@ -122,7 +122,7 @@ def main():
 
 
     # Export databases
-    if args.databseuser and args.databsepassword:
+    if args.databaseuser and args.databasepassword:
         print("\nBacking up databases...")
 
         os.mkdir(tempFiles)
@@ -132,8 +132,8 @@ def main():
             subprocess.call([
                 "{}\mysqldump".format(MYSQLDUMP_PATH),
                 "-u",
-                "{}".format(args.databseuser),
-                "-p{}".format(args.databsepassword),
+                "{}".format(args.databaseuser),
+                "-p{}".format(args.databasepassword),
                 "{}".format(database),
                 ">",
                 "{}\{}.sql".format(tempFiles,database)
@@ -182,6 +182,7 @@ def main():
                             ftp.delete(file)
                     ftp.cwd("..")
                     ftp.rmd(folder)
+                if len(ftp.nlst()) <= BACKUPS_TO_KEEP + 3: # 3 = [".", "..", ".banner"]
                     break
     else:
         print("\nSkipping upload to backup server (no user and password)")
