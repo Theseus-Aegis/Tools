@@ -16,7 +16,7 @@ TEMP = "C:\\tmp\\backup"
 ARMA_SERVERS_PATH = "Theseus\\Arma 3\\Servers"
 MYSQLDUMP_PATH = "C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin"
 # CONTENTS
-ITEMS = ["Apache24", "php", "Program Files (x86)\\hMailServer\\Data", "ProgramData\\MySQL\\MySQL Server 5.7\\Data", "Theseus\\Arma 3\\Missions Archive", "Theseus\\Arma 3\\Modpack\\development", "Theseus\\Athena", "Theseus\\TeamSpeak 3 Server", "Theseus\\www\\drupal", "Theseus\\www\\resources", "Theseus\\www\\squadxml", "Theseus\\www\\webmail", "Theseus\\files_changed.txt"]
+ITEMS = ["Apache24", "php", "Program Files (x86)\\hMailServer\\Data", "ProgramData\\MySQL\\MySQL Server 5.7\\Data", "Theseus\\Arma 3\\Missions Archive", "Theseus\\Arma 3\\Modpack\\development", "Theseus\\Athena", "Theseus\\TeamSpeak 3 Server", "Theseus\\www\\drupal", "Theseus\\www\\resources\\TheseusServices", "Theseus\\www\\squadxml", "Theseus\\www\\webmail", "Theseus\\files_changed.txt"]
 ARMA_SERVER_ITEMS = ["Apollo", "mpmissions", "apollo.properties", "jni.conf", "jni.dll", "params.cfg", "server.cfg"]
 DATABASES = ["apollo", "apollo_test", "drupal", "hmaildb"]
 # OTHER
@@ -172,7 +172,7 @@ def main():
         # Remove oldest backup when there is more than 10
         ftp.cwd("..")
         folders = ftp.nlst()
-        if len(folders) > BACKUPS_TO_KEEP + 3: # 3 = [".", "..", ".banner"]
+        if len(folders) > BACKUPS_TO_KEEP + 4: # 3 = [".", "..", ".banner", ".ftpquota"]
             for folder in folders:
                 if folder.startswith("2"):
                     print("- Removing old backup: {}".format(folder))
@@ -182,7 +182,7 @@ def main():
                             ftp.delete(file)
                     ftp.cwd("..")
                     ftp.rmd(folder)
-                if len(ftp.nlst()) <= BACKUPS_TO_KEEP + 3: # 3 = [".", "..", ".banner"]
+                if len(ftp.nlst()) <= BACKUPS_TO_KEEP + 4: # 3 = [".", "..", ".banner", ".ftpquota"]
                     break
     else:
         print("\nSkipping upload to backup server (no user and password)")
