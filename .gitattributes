@@ -1,2 +1,4 @@
+* text=auto
+
 # Use new for mission.sqm merging
 *.sqm merge=theirs
