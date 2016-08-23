@@ -10,7 +10,7 @@
  * Data <ARRAY>
  *
  * Example:
- * [0] execVM "compatibleMagazinesRetrieve.sqf";
+ * [0] execVM "retrieveCompatibleItems.sqf";
  *
  * Public: No
  */
