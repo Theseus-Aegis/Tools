@@ -11,9 +11,10 @@ import stat
 
 ######## GLOBALS #########
 # PATHS
-TEMP = "C:\\tmp\\backup"
+TEMP = "D:\\Theseus\\Tools\\temp"
 ARMA_SERVERS_PATH = "C:\\Theseus\\Arma 3 Servers"
 MYSQLDUMP_PATH = "C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin"
+STORAGE = "D:\\Backup"
 # CONTENTS
 ITEMS = ["C:\\Apache24", "C:\\php", "C:\\Program Files (x86)\\hMailServer\\Data", "C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Data", "D:\\Theseus\\Arma 3\\Missions Archive", "D:\\Theseus\\Arma 3\\Modpack\\development", "D:\\Theseus\\Athena", "D:\\Theseus\\TeamSpeak 3 Server", "D:\\Theseus\\www\\drupal", "D:\\Theseus\\www\\resources\\TheseusServices", "D:\\Theseus\\www\\squadxml", "D:\\Theseus\\www\\webmail", "D:\\Theseus\\files_changed.txt"]
 ARMA_SERVER_ITEMS = ["Apollo", "mpmissions", "apollo.properties", "jni.conf", "jni.dll", "params.cfg", "server.cfg"]
@@ -37,6 +38,10 @@ def main():
     parser.add_argument("-ftpp", "--ftppassword", default=False, type=str, required=False, help="FTP backup server password")
     parser.add_argument("-si", "--specificitem", default=False, type=str, required=False, help="backup only specific item")
     parser.add_argument("-sdb", "--specificdatabase", default=False, type=str, required=False, help="backup only specific database")
+    keep_parser = parser.add_mutually_exclusive_group(required=False)
+    keep_parser.add_argument("-k", "--keep", dest="keep", action="store_true", help="keep backup locally")
+    keep_parser.add_argument("-nk", "--no-keep", dest="keep", action="store_false", help="remove local backup")
+    parser.set_defaults(keep=True)
     args = parser.parse_args()
 
     items = ITEMS
@@ -49,7 +54,7 @@ def main():
 
 
     # Prepare temporary folders and date
-    date = time.strftime("%Y%m%d")
+    date = time.strftime("%Y%m%dT%H%M%S")
 
     tempFiles = os.path.join(TEMP,"files")
     packedFiles = os.path.join(TEMP,"packed")
@@ -108,7 +113,7 @@ def main():
                         shutil.copy2(itemPath,tempFiles)
 
             # Zip it up and move it to another folder
-            name = ARMA_SERVERS_PATH.replace(" ", "_").replace("\\", "_")
+            name = ARMA_SERVERS_PATH[3:].replace(" ", "_").replace("\\", "_")
             name = "{}_{}".format(name,serverDir).lower()
 
             archive = shutil.make_archive("{}_{}".format(date,name), "zip", tempFiles)
@@ -146,9 +151,9 @@ def main():
         print("\nSkipping database backup (no user and password)")
 
 
-    # Upload to backup server
+    # Upload to FTP server
     if args.ftpserver and args.ftpuser and args.ftppassword:
-        print("\nUploading to backup server...")
+        print("\nUploading to FTP server...")
 
         # Establish FTP connection
         ftp = ftplib.FTP(args.ftpserver)
@@ -166,23 +171,53 @@ def main():
             print("- {}".format(filePath))
             ftp.storbinary("STOR {}".format(file), open(filePath, "rb"), 1024)
 
-        # Remove oldest backup when there is more than 10
+        # Remove oldest backup when there are more than BACKUPS_TO_KEEP
         ftp.cwd("..")
-        folders = ftp.nlst()
-        if len(folders) > BACKUPS_TO_KEEP + 4: # 3 = [".", "..", ".banner", ".ftpquota"]
-            for folder in folders:
-                if folder.startswith("2"):
-                    print("- Removing old backup: {}".format(folder))
-                    ftp.cwd(folder)
-                    for file in ftp.nlst():
-                        if file.startswith("2"):
-                            ftp.delete(file)
-                    ftp.cwd("..")
-                    ftp.rmd(folder)
-                if len(ftp.nlst()) <= BACKUPS_TO_KEEP + 4: # 3 = [".", "..", ".banner", ".ftpquota"]
-                    break
+        folders = [x for x in ftp.nlst() if "_theseus_backup" in x]
+        folders.sort()
+        amountToRemove = len(folders) - BACKUPS_TO_KEEP - 4 # 4 = [".", "..", ".banner", ".ftpquota"]
+        if amountToRemove > 0:
+            print("- Removing {} old backup(s)...".format(amountToRemove))
+
+            for folder in folders[:amountToRemove]:
+                print("  - {}".format(folder))
+
+                ftp.cwd(folder)
+                for file in ftp.nlst():
+                    if file.startswith("2"):
+                        ftp.delete(file)
+                ftp.cwd("..")
+                ftp.rmd(folder)
+        else:
+            print("- Skipping removal of old backups (not enough of them)")
     else:
-        print("\nSkipping upload to backup server (no user and password)")
+        print("\nSkipping upload to FTP server (no user and password)")
+
+
+    # Move to specified storage location or remove
+    if args.keep:
+        print("\nMoving to storage location...")
+
+        if not os.path.exists(STORAGE):
+            os.mkdir(STORAGE)
+
+        folder = "{}\\{}_theseus_backup".format(STORAGE,date)
+        shutil.move(packedFiles,folder)
+
+        # Remove oldest backup when there are more than BACKUPS_TO_KEEP
+        folders = [x for x in os.listdir(STORAGE) if "_theseus_backup" in x]
+        folders.sort()
+        amountToRemove = len(folders) - BACKUPS_TO_KEEP
+        if amountToRemove > 0:
+            print("- Removing {} old backup(s)...".format(amountToRemove))
+
+            for folder in folders[:amountToRemove]:
+                print("  - {}".format(folder))
+                shutil.rmtree(os.path.join(STORAGE,folder), onerror=remove_readonly)
+        else:
+            print("- Skipping removal of old backups (not enough of them)")
+    else:
+        print("\nSkipping move to storage location (removing local backup)")
 
 
     # Remove temporary folder
