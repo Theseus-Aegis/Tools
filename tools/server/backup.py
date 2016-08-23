@@ -11,12 +11,11 @@ import stat
 
 ######## GLOBALS #########
 # PATHS
-ROOT = "C:\\"
 TEMP = "C:\\tmp\\backup"
-ARMA_SERVERS_PATH = "Theseus\\Arma 3\\Servers"
+ARMA_SERVERS_PATH = "C:\\Theseus\\Arma 3 Servers"
 MYSQLDUMP_PATH = "C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin"
 # CONTENTS
-ITEMS = ["Apache24", "php", "Program Files (x86)\\hMailServer\\Data", "ProgramData\\MySQL\\MySQL Server 5.7\\Data", "Theseus\\Arma 3\\Missions Archive", "Theseus\\Arma 3\\Modpack\\development", "Theseus\\Athena", "Theseus\\TeamSpeak 3 Server", "Theseus\\www\\drupal", "Theseus\\www\\resources\\TheseusServices", "Theseus\\www\\squadxml", "Theseus\\www\\webmail", "Theseus\\files_changed.txt"]
+ITEMS = ["C:\\Apache24", "C:\\php", "C:\\Program Files (x86)\\hMailServer\\Data", "C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Data", "D:\\Theseus\\Arma 3\\Missions Archive", "D:\\Theseus\\Arma 3\\Modpack\\development", "D:\\Theseus\\Athena", "D:\\Theseus\\TeamSpeak 3 Server", "D:\\Theseus\\www\\drupal", "D:\\Theseus\\www\\resources\\TheseusServices", "D:\\Theseus\\www\\squadxml", "D:\\Theseus\\www\\webmail", "D:\\Theseus\\files_changed.txt"]
 ARMA_SERVER_ITEMS = ["Apollo", "mpmissions", "apollo.properties", "jni.conf", "jni.dll", "params.cfg", "server.cfg"]
 DATABASES = ["apollo", "apollo_test", "drupal", "hmaildb"]
 # OTHER
@@ -64,21 +63,20 @@ def main():
     print("Backing up items...")
 
     for item in items:
-        itemPath = os.path.join(ROOT,item)
-        if os.path.exists(itemPath):
-            print("- {}".format(itemPath))
+        if os.path.exists(item):
+            print("- {}".format(item))
 
             # Copy to temporary folder to prevent access issues
             os.mkdir(tempFiles)
-            if os.path.isdir(itemPath):
-                tempFolder = itemPath.rsplit("\\", 1)[1]
+            if os.path.isdir(item):
+                tempFolder = item.rsplit("\\", 1)[1]
                 tempFolder = os.path.join(tempFiles,tempFolder)
-                shutil.copytree(itemPath,tempFolder)
+                shutil.copytree(item,tempFolder)
             else:
-                shutil.copy2(itemPath,tempFiles)
+                shutil.copy2(item,tempFiles)
 
             # Zip it up and move it to another folder
-            name = item.replace(" ", "_").replace("\\", "_").replace("__", "_").lower()
+            name = item[3:].replace(" ", "_").replace("\\", "_").replace("__", "_").lower()
             if "." in name:
                 name = name.split(".", 1)[0]
 
@@ -92,10 +90,9 @@ def main():
     # Backup Arma 3 Server items
     print("\nBacking up Arma 3 Server items...")
 
-    serversPath = os.path.join(ROOT,ARMA_SERVERS_PATH)
-    if os.path.exists(serversPath):
-        for serverDir in os.listdir(serversPath):
-            serverPath = os.path.join(serversPath,serverDir)
+    if os.path.exists(ARMA_SERVERS_PATH):
+        for serverDir in os.listdir(ARMA_SERVERS_PATH):
+            serverPath = os.path.join(ARMA_SERVERS_PATH,serverDir)
             print("- {}".format(serverPath))
 
             os.mkdir(tempFiles)
