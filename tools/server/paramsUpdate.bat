@@ -3,14 +3,14 @@ setlocal EnableDelayedExpansion
 
 rem STATIC VARIABLES
 rem Custom servers
-set serversFolder="C:\Theseus\Arma 3\Servers"
+set serversFolder="C:\Theseus\Arma 3 Servers"
 rem Mod line
 set mods=(tac_core)
 set serverMods=(tac_server)
 set modsPreload=(tac_core\@CBA_A3 tac_core\@ace tac_core\@tac_mods)
 set headlessServerMods=()
 
-cd %serversFolder%
+cd /d %serversFolder%
 
 rem INPUT VARIABLES
 set /p type="Enter type ('server' or 'hc'): "
@@ -44,7 +44,7 @@ if !existsServer!=="true" (
     exit /b
 )
 
-cd %server%
+cd /d %server%
 
 rem Build -mod and -serverMod parameters
 echo.
