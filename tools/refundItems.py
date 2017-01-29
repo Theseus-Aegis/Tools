@@ -21,18 +21,31 @@ DB_USERS = "drupal"
 TABLE_IDS = "field_data_field_player_id" # References from user_id to player_id
 ##########################
 
-def allInventoryToList(rows, items):
+def allInventoryToList(rows, args):
     inventory = []
+
+    # Get items from columns
     for row in rows:
-        if row[4].lower() in items: # Headgear
+        if row[4].lower() in args.items: # Headgear
             inventory.append([row[0], row[4].lower(), 1])
-        if row[5].lower() in items: # Goggles
+        if row[5].lower() in args.items: # Goggles
             inventory.append([row[0], row[5].lower(), 1])
-        if row[6].lower() in items: # Uniform
+        if row[6].lower() in args.items: # Uniform
             inventory.append([row[0], row[6].lower(), 1])
         #if [str(row[7]).replace("|", ",")]: # Uniform Items
-        if row[15].lower() in items: # Secondary Weapon Attachments
+        if row[15].lower() in args.items: # Secondary Weapon Attachments
             inventory.append([row[0], row[15].lower(), 1])
+
+    # Convert player_id in equipped data to user_id
+    dbUsers = MySQLdb.connect(host=args.databasehost, user=args.databaseuser, passwd=args.databasepassword, db=DB_USERS)
+    usersCur = dbUsers.cursor()
+
+    for item in inventory:
+        usersCur.execute("SELECT * FROM " + TABLE_IDS + " WHERE field_player_id_value = " + str(item[0]))
+        for row in usersCur.fetchall():
+            item[0] = row[3]
+
+    dbUsers.close()
 
     return inventory
 
@@ -47,12 +60,13 @@ def main():
 
     args.items = [item.lower() for item in args.items]
 
-    itemMap = [] # [className, prettyName, price]
     ownershipData = [] # [user_id, item, quantity]
 
     dbApollo = MySQLdb.connect(host=args.databasehost, user=args.databaseuser, passwd=args.databasepassword, db=DB_ITEMS)
     apolloCur = dbApollo.cursor()
 
+    # Prepare item map
+    itemMap = [] # [className, prettyName, price]
     apolloCur.execute("SELECT * FROM " + TABLE_ITEMLIST + " WHERE className IN (" + str(args.items)[1:-1] + ")")
     for row in apolloCur.fetchall():
         itemMap.append([row[1].lower(), row[2], row[6]])
@@ -60,13 +74,7 @@ def main():
     print("\nItem data:")
     print(itemMap)
 
-    equippedData = [] # [player_id, item, quantity]
-    apolloCur.execute("SELECT * FROM " + TABLE_EQUIPPED)
-    equippedData = allInventoryToList(apolloCur.fetchall(), args.items)
-
-    print("\nEquipped data:")
-    print(equippedData)
-
+    # Get locker data
     apolloCur.execute("SELECT * FROM " + TABLE_LOCKER + " WHERE className IN (" + str(args.items)[1:-1] + ") AND quantity > 0")
     for row in apolloCur.fetchall():
         ownershipData.append([row[0], row[1].lower(), row[2]])
@@ -74,18 +82,9 @@ def main():
     print("\nLocker data:")
     print(ownershipData)
 
-    # Get user data
-    userData = [] # [user_id, player_id]
-
-    dbUsers = MySQLdb.connect(host=args.databasehost, user=args.databaseuser, passwd=args.databasepassword, db=DB_USERS)
-    usersCur = dbUsers.cursor()
-
-    for item in equippedData:
-        usersCur.execute("SELECT * FROM " + TABLE_IDS + " WHERE field_player_id_value = " + str(item[0]))
-        for row in usersCur.fetchall():
-            ownershipData.append([row[3], item[1], item[2]])
-
-    dbUsers.close()
+    # Get equipped data
+    apolloCur.execute("SELECT * FROM " + TABLE_EQUIPPED)
+    ownershipData += allInventoryToList(apolloCur.fetchall(), args)
 
     print("\nOwnership data:")
     print(ownershipData)
