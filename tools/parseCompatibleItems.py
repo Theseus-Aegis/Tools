@@ -14,8 +14,8 @@ import argparse
 ############################
 
 ######## GLOBALS #########
-INPUT = "temp\\compatibleItems.txt" # Usually too many data to fill into clipboard
-OUTPUT = "temp\\compatibleItems.sql"
+INPUT = "temp/compatibleItems.txt" # Usually too many data to fill into clipboard
+OUTPUT = "temp/compatibleItems.sql"
 SQL_DBNAME = "apollo"
 SQL_TABLENAME_0 = "ammotypes"
 SQL_TABLENAME_1 = "attachmenttypes"
