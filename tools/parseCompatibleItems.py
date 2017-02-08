@@ -47,7 +47,7 @@ def main():
         os.makedirs("temp")
 
     # Prepare output file (clean and add SQL statements)
-    with open(OUTPUT, "w") as file:
+    with open(OUTPUT, "w", newline="\n") as file:
         print("Preparing output file ...\n")
         file.write("TRUNCATE TABLE {}.{};\n\nINSERT INTO {}.{}\n    (weaponClass, {})\nVALUES\n".format(SQL_DBNAME, sql_tablename, SQL_DBNAME, sql_tablename, sql_colname))
 
@@ -62,7 +62,7 @@ def main():
         countDuplicates = 0
 
         print("Adding SQL insert statements ...")
-        with open(OUTPUT, "a") as file:
+        with open(OUTPUT, "a", newline="\n") as file:
             # Loop through all data
             for subdata in data:
                 # Replace characters and form a list
@@ -94,9 +94,9 @@ def main():
     # Finalize output file (remove last comma and write semi-colon in its place)
     with open(OUTPUT, "rb+") as file:
         print("\nFinalizing output file ...\n")
-        file.seek(-3, os.SEEK_END)
+        file.seek(-2, os.SEEK_END)
         file.truncate()
-        file.write(";".encode()) # Encode to form a byte-object, because file is open in binary format
+        file.write(";\n".encode()) # Encode to form a byte-object, because file is open in binary format
 
     print("SQL script written to {}, run it in your preferred MySQL workspace.".format(OUTPUT))
 
