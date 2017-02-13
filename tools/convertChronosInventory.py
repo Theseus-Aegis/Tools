@@ -165,13 +165,9 @@ def main():
     db.close()
 
     with open(OUTPUT, "w", newline="\n") as file:
-        file.write("INSERT INTO {}.{}\n    (playerID, loadout)\nVALUES\n".format(DB_ITEMS, TABLE_EQUIPPED))
         for loadout in loadouts:
-            file.write("    ('{}', '{}')".format(loadout[0], json.dumps(loadout[1], separators=(',', ':'))))
-            if (loadout != loadouts[-1]):
-                file.write(",\n")
-            else:
-                file.write(";\n")
+            loadoutJSON = json.dumps(loadout[1], separators=(",", ":"))
+            file.write("UPDATE {}.{} SET loadout='{}' WHERE playerID='{}';\n".format(DB_ITEMS, TABLE_EQUIPPED, loadoutJSON, loadout[0]))
 
 
 if __name__ == "__main__":
