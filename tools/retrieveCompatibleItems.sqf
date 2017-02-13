@@ -17,7 +17,7 @@
 
 params [["_type", 0]];
 
-private _data = []; // [ weapon, [items], weapon, [items] ]
+private _data = []; // [ weapon, [items], weapon, [items], ... ]
 
 {
     private _weaponClassname = configName _x;
