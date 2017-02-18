@@ -62,17 +62,16 @@ def getMagazineMaxAmmo(magazinesRef, magazine):
     return magazinesRef[1][index]
 
 def createWeapon(itemList, magazinesRef, weapons, attachments, magazines, category):
-    weapons = weapons.split("|")
-    attachments = attachments.split("|")
-    magazines = magazines.split("|")
+    weapons = [x for x in weapons.split("|") if x]
+    attachments = [x for x in attachments.split("|") if x]
 
     weapon = findItemByCategory(itemList, weapons, category)
-
     if (weapon == ""):
         return []
 
     magazine = findItemBySubCategory(itemList, magazines, "Magazine")
     magazineGL = findItemBySubCategory(itemList, magazines, "Launchable")
+
     weaponData = [
         findItemByCategory(itemList, weapons, category),
         findItemBySubCategory(itemList, attachments, "Barrel-attachment"),
@@ -119,10 +118,26 @@ def createAssignedItems(itemList, assignedItems):
     return assignedItems
 
 def createLoadout(itemList, magazinesRef, row):
+    magazines = row[LOADED_MAGAZINES].split("|")
+    magazines = [x for x in magazines if x]
+
+    magazinesPistol = []
+    magazinesRifle = []
+    if len(magazines) == 1:
+        magazinesRifle.append(magazines[0])
+    elif len(magazines) > 1:
+        magazinesPistol.append(magazines[0])
+        magazinesRifle.append(magazines[1])
+        if len(magazines) > 2:
+            magazinesRifle.append(magazines[2])
+
+    print(magazinesPistol)
+    print(magazinesRifle)
+
     loadout = [
-        createWeapon(itemList, magazinesRef, row[WEAPONS], row[RIFLE_ATTACHMENTS], row[LOADED_MAGAZINES], "Rifle"),
-        createWeapon(itemList, magazinesRef, row[WEAPONS], row[LAUNCHER_ATTACHMENTS], row[LOADED_MAGAZINES], "Pistol"),
-        createWeapon(itemList, magazinesRef, row[WEAPONS], row[HANDGUN_ATTACHMENTS], row[LOADED_MAGAZINES], "Launcher"),
+        createWeapon(itemList, magazinesRef, row[WEAPONS], row[RIFLE_ATTACHMENTS], magazinesRifle, "Rifle"),
+        [], #createWeapon(itemList, magazinesRef, row[WEAPONS], row[LAUNCHER_ATTACHMENTS], magazineLauncher, "Launcher"),
+        createWeapon(itemList, magazinesRef, row[WEAPONS], row[HANDGUN_ATTACHMENTS], magazinesPistol, "Pistol"),
         createContainer(itemList, magazinesRef, row[UNIFORM], row[UNIFORM_ITEMS]),
         createContainer(itemList, magazinesRef, row[VEST], row[VEST_ITEMS]),
         createContainer(itemList, magazinesRef, row[BACKPACK], row[BACKPACK_ITEMS]),
