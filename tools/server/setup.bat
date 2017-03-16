@@ -125,7 +125,7 @@ rem rem Install service
 echo.
 echo Installing service...
 echo -----------------------------
-nssm install "Arma 3 %server%" "%serversFolder%\%server%\arma3server.exe" -exThreads=7 -enableHT -profiles=profiles -par=params.cfg
+nssm install "Arma 3 %server%" "%serversFolder%\%server%\arma3server_x64.exe" -exThreads=7 -enableHT -profiles=profiles -par=params.cfg
 nssm set "Arma 3 %server%" Description Arma 3 Server - %server% - Theseus Inc. (runs through nssm)
 nssm set "Arma 3 %server%" Start SERVICE_DELAYED_AUTO_START
 nssm set "Arma 3 %server%" Type SERVICE_INTERACTIVE_PROCESS
