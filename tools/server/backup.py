@@ -23,6 +23,11 @@ DATABASES = ["apollo", "apollo_test", "drupal", "hmaildb"]
 BACKUPS_TO_KEEP = 10
 ##########################
 
+def log(text):
+    print(text)
+    with open("backup.log", "a") as logfile:
+        logfile.write("[{}] {}\n".format(time.strftime("%Y%m%dT%H%M%S"), text))
+
 def remove_readonly(function, path, exc):
     os.chmod(path, stat.S_IWRITE)
     function(path)
@@ -55,6 +60,7 @@ def main():
 
     # Prepare temporary folders and date
     date = time.strftime("%Y%m%dT%H%M%S")
+    log("Starting backup!")
 
     tempFiles = os.path.join(TEMP,"files")
     packedFiles = os.path.join(TEMP,"packed")
@@ -65,11 +71,11 @@ def main():
 
 
     # Backup items
-    print("Backing up items...")
+    log("Backing up items...")
 
     for item in items:
         if os.path.exists(item):
-            print("- {}".format(item))
+            log("- {}".format(item))
 
             # Copy to temporary folder to prevent access issues
             os.mkdir(tempFiles)
@@ -93,12 +99,12 @@ def main():
 
 
     # Backup Arma 3 Server items
-    print("\nBacking up Arma 3 Server items...")
+    log("Backing up Arma 3 Server items...")
 
     if os.path.exists(ARMA_SERVERS_PATH):
         for serverDir in os.listdir(ARMA_SERVERS_PATH):
             serverPath = os.path.join(ARMA_SERVERS_PATH,serverDir)
-            print("- {}".format(serverPath))
+            log("- {}".format(serverPath))
 
             os.mkdir(tempFiles)
             for item in ARMA_SERVER_ITEMS:
@@ -125,11 +131,11 @@ def main():
 
     # Export databases
     if args.databaseuser and args.databasepassword:
-        print("\nBacking up databases...")
+        log("Backing up databases...")
 
         os.mkdir(tempFiles)
         for database in databases:
-            print("- {}".format(database))
+            log("- {}".format(database))
 
             subprocess.call([
                 "{}\mysqldump".format(MYSQLDUMP_PATH),
@@ -148,12 +154,12 @@ def main():
         # Remove temporary folder to allow copytree to create it again
         shutil.rmtree(tempFiles, onerror=remove_readonly)
     else:
-        print("\nSkipping database backup (no user and password)")
+        log("Skipping database backup (no user and password)")
 
 
     # Upload to FTP server
     if args.ftpserver and args.ftpuser and args.ftppassword:
-        print("\nUploading to FTP server...")
+        log("Uploading to FTP server...")
 
         # Establish FTP connection
         ftp = ftplib.FTP(args.ftpserver)
@@ -168,7 +174,7 @@ def main():
         ftp.cwd(folder)
         for file in os.listdir(packedFiles):
             filePath = os.path.join(packedFiles,file)
-            print("- {}".format(filePath))
+            log("- {}".format(filePath))
             ftp.storbinary("STOR {}".format(file), open(filePath, "rb"), 1024)
 
         # Remove oldest backup when there are more than BACKUPS_TO_KEEP
@@ -177,10 +183,10 @@ def main():
         folders.sort()
         amountToRemove = len(folders) - BACKUPS_TO_KEEP - 4 # 4 = [".", "..", ".banner", ".ftpquota"]
         if amountToRemove > 0:
-            print("- Removing {} old backup(s)...".format(amountToRemove))
+            log("- Removing {} old backup(s)...".format(amountToRemove))
 
             for folder in folders[:amountToRemove]:
-                print("  - {}".format(folder))
+                log("  - {}".format(folder))
 
                 ftp.cwd(folder)
                 for file in ftp.nlst():
@@ -189,14 +195,14 @@ def main():
                 ftp.cwd("..")
                 ftp.rmd(folder)
         else:
-            print("- Skipping removal of old backups (not enough of them)")
+            log("- Skipping removal of old backups (not enough of them)")
     else:
-        print("\nSkipping upload to FTP server (no user and password)")
+        log("Skipping upload to FTP server (no user and password)")
 
 
     # Move to specified storage location or remove
     if args.keep:
-        print("\nMoving to storage location...")
+        log("Moving to storage location...")
 
         if not os.path.exists(STORAGE):
             os.mkdir(STORAGE)
@@ -209,19 +215,21 @@ def main():
         folders.sort()
         amountToRemove = len(folders) - BACKUPS_TO_KEEP
         if amountToRemove > 0:
-            print("- Removing {} old backup(s)...".format(amountToRemove))
+            log("- Removing {} old backup(s)...".format(amountToRemove))
 
             for folder in folders[:amountToRemove]:
-                print("  - {}".format(folder))
+                log("--- {}".format(folder))
                 shutil.rmtree(os.path.join(STORAGE,folder), onerror=remove_readonly)
         else:
-            print("- Skipping removal of old backups (not enough of them)")
+            log("- Skipping removal of old backups (not enough of them)")
     else:
-        print("\nSkipping move to storage location (removing local backup)")
+        log("Skipping move to storage location (removing local backup)")
 
 
     # Remove temporary folder
     shutil.rmtree(TEMP, onerror=remove_readonly)
+
+    log("Backup completed!")
 
 
 if __name__ == "__main__":
