@@ -1,13 +1,20 @@
 /*
-    Call from initPlayerLocal.sqf through CfgFunctions or compile directly:
-        params ["_player"];
-        [_player] call compile preprocessFileLineNumbers "functions\fnc_baseSpectator.sqf";
+ * Author: Jonpas
+ * Adds dynamic spectator availability through CBA Chat Commands and ACE3 Interaction Menu.
+ * Call from initPlayerLocal.sqf.
+ *
+ * Arguments:
+ * 0: Player <OBJECT>
+ * 1: Spectator Object <OBJECT>
+ *
+ * Return Value:
+ * None
+ *
+ * Example:
+ * [player, spectatorObject] call TAC_Scripts_fnc_baseSpectator
+ */
 
-    Define SPECATOR_OBJECT defined below this comment.
-*/
-#define SPECTATOR_OBJECT baseSpectator // Object where spectator is toggled on
-
-params ["_player"];
+params ["_player", "_object"];
 
 // Event for closing spectator from other machines
 ["tac_baseSpectatorOff", {
@@ -18,31 +25,39 @@ params ["_player"];
 }, _player] call CBA_fnc_addEventHandlerArgs;
 
 // Player open spectator on specified object
-private _actionOpenSpectator = [
+private _actionOpen = [
     "tac_baseSpectatorOpen",
     "Open Spectator",
-    "\A3\UI_F_Curator\Data\Displays\RscDisplayCurator\modeUnits_ca.paa",
+    "\a3\3den\data\cfg3den\camera\cameratexture_ca.paa",
     {
+        (_this select 2) params ["_player"];
         [true] call ace_spectator_fnc_setSpectator;
-        (_this select 2) setVariable ["tac_baseSpectatorSet", true];
+        _player setVariable ["tac_baseSpectatorSet", true];
+        systemChat "[TAC] Entered Spectator - Write '#tac-spectator-exit' in chat to exit";
     },
     {
-        SPECTATOR_OBJECT getVariable ["tac_baseSpectatorEnabled", false]
+        (_this select 2) params ["", "_object"];
+        _object getVariable ["tac_baseSpectatorAllowed", false]
     },
     {},
-    _player
+    [_player, _object]
 ] call ace_interact_menu_fnc_createAction;
 
-[SPECTATOR_OBJECT, 0, ["ACE_MainActions"], _actionOpenSpectator] call ace_interact_menu_fnc_addActionToObject;
+[_object, 0, ["ACE_MainActions"], _actionOpen] call ace_interact_menu_fnc_addActionToObject;
 
 // Admin chat command to toggle spectator availability
+tac_baseSpectatorObject = _object;
 ["tac-spectator", {
     params ["_args"];
     if (_args == "on") then {
-        SPECTATOR_OBJECT setVariable ["tac_baseSpectatorEnabled", true, true];
+        tac_baseSpectatorObject setVariable ["tac_baseSpectatorAllowed", true, true];
+        ["ace_common_systemChatGlobal", "[TAC] Spectator Allowed"] call CBA_fnc_globalEvent;
     } else {
-        SPECTATOR_OBJECT setVariable ["tac_baseSpectatorEnabled", false, true];
-        ["tac_baseSpectatorOff", nil, call CBA_fnc_players] call CBA_fnc_targetEvent;
+        if (tac_baseSpectatorObject getVariable ["tac_baseSpectatorAllowed", false]) then {
+            ["tac_baseSpectatorOff", nil, call CBA_fnc_players] call CBA_fnc_targetEvent;
+            tac_baseSpectatorObject setVariable ["tac_baseSpectatorAllowed", false, true];
+            ["ace_common_systemChatGlobal", "[TAC] Spectator Prohibited"] call CBA_fnc_globalEvent;
+        };
     };
 }] call CBA_fnc_registerChatCommand;
 
