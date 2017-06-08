@@ -46,26 +46,25 @@ private _actionOpen = [
 [_object, 0, ["ACE_MainActions"], _actionOpen] call ace_interact_menu_fnc_addActionToObject;
 
 // Admin chat command to toggle spectator availability
-tac_baseSpectatorObject = _object;
 ["tac-spectator", {
     params ["_args"];
     if (_args == "on") then {
-        tac_baseSpectatorObject setVariable ["tac_baseSpectatorAllowed", true, true];
+        _thisArgs setVariable ["tac_baseSpectatorAllowed", true, true];
         ["ace_common_systemChatGlobal", "[TAC] Spectator Allowed"] call CBA_fnc_globalEvent;
     } else {
-        if (tac_baseSpectatorObject getVariable ["tac_baseSpectatorAllowed", false]) then {
+        if (_thisArgs getVariable ["tac_baseSpectatorAllowed", false]) then {
             ["tac_baseSpectatorOff", nil, call CBA_fnc_players] call CBA_fnc_targetEvent;
-            tac_baseSpectatorObject setVariable ["tac_baseSpectatorAllowed", false, true];
+            _thisArgs setVariable ["tac_baseSpectatorAllowed", false, true];
             ["ace_common_systemChatGlobal", "[TAC] Spectator Prohibited"] call CBA_fnc_globalEvent;
         };
     };
-}] call CBA_fnc_registerChatCommand;
+}, nil, _object] call CBA_fnc_registerChatCommand;
 
 // Player chat command to exit spectator
 ["tac-spectator-exit", {
     [false] call ace_spectator_fnc_setSpectator;
-    ace_player setVariable ["tac_baseSpectatorSet", false];
-}, "all"] call cba_fnc_registerChatCommand;
+    _thisArgs setVariable ["tac_baseSpectatorSet", false];
+}, "all", _player] call CBA_fnc_registerChatCommand;
 
 
 // Can't add ACE canInteractWith exception in SQF
