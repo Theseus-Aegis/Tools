@@ -17,7 +17,7 @@
 params ["_player", "_object"];
 
 // Event for closing spectator from other machines
-["tac_baseSpectatorOff", {
+["tac_baseSpectatorProhibit", {
     if (_thisArgs getVariable ["tac_baseSpectatorSet", false]) then {
         [false] call ace_spectator_fnc_setSpectator;
         _thisArgs setVariable ["tac_baseSpectatorSet", false];
@@ -33,7 +33,6 @@ private _actionOpen = [
         (_this select 2) params ["_player"];
         [true, false] call ace_spectator_fnc_setSpectator; // Forced by default (second parameter), non-forced allows user to exit
         _player setVariable ["tac_baseSpectatorSet", true];
-        systemChat "[TAC] Entered Spectator - Write '#tac-spectator-exit' in chat to exit";
     },
     {
         (_this select 2) params ["", "_object"];
@@ -54,7 +53,7 @@ tac_baseSpectatorObject = _object;
         ["ace_common_systemChatGlobal", "[TAC] Spectator Allowed"] call CBA_fnc_globalEvent;
     } else {
         if (tac_baseSpectatorObject getVariable ["tac_baseSpectatorAllowed", false]) then {
-            ["tac_baseSpectatorOff", nil, call CBA_fnc_players] call CBA_fnc_targetEvent;
+            ["tac_baseSpectatorProhibit", nil, call CBA_fnc_players] call CBA_fnc_targetEvent;
             tac_baseSpectatorObject setVariable ["tac_baseSpectatorAllowed", false, true];
             ["ace_common_systemChatGlobal", "[TAC] Spectator Prohibited"] call CBA_fnc_globalEvent;
         };
