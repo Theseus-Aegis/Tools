@@ -31,7 +31,7 @@ private _actionOpen = [
     "\a3\3den\data\cfg3den\camera\cameratexture_ca.paa",
     {
         (_this select 2) params ["_player"];
-        [true] call ace_spectator_fnc_setSpectator;
+        [true, false] call ace_spectator_fnc_setSpectator; // Forced by default (second parameter), non-forced allows user to exit
         _player setVariable ["tac_baseSpectatorSet", true];
         systemChat "[TAC] Entered Spectator - Write '#tac-spectator-exit' in chat to exit";
     },
@@ -60,30 +60,3 @@ tac_baseSpectatorObject = _object;
         };
     };
 }] call CBA_fnc_registerChatCommand;
-
-// Player chat command to exit spectator
-["tac-spectator-exit", {
-    [false] call ace_spectator_fnc_setSpectator;
-    ace_player setVariable ["tac_baseSpectatorSet", false];
-}, "all"] call cba_fnc_registerChatCommand;
-
-
-// Can't add ACE canInteractWith exception in SQF
-/*
-private _actionCloseSpectator = [
-    "tac_baseSpectatorClose",
-    "Close Spectator",
-    "\A3\UI_F_Curator\Data\Displays\RscDisplayCurator\modeUnits_ca.paa",
-    {
-        //TODO stage, set?
-        [false] call ace_spectator_fnc_setSpectator;
-    },
-    {
-        (_this select 2) getVariable ["tac_baseSpectatorSet", false];
-    },
-    {},
-    _player
-] call ace_interact_menu_fnc_createAction;
-
-[_player, 1, ["ACE_SelfActions"], _actionCloseSpectator] call ace_interact_menu_fnc_addActionToObject;
-*/
