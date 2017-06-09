@@ -37,7 +37,6 @@ private _actionOpen = [
 // Admin chat command to toggle spectator availability
 tac_baseSpectatorObject = _object;
 ["tac-spectator", {
-    params ["_args"];
     if (tac_baseSpectatorObject getVariable ["tac_baseSpectatorAllowed", false]) then {
         ["tac_baseSpectatorProhibit", nil, call CBA_fnc_players] call CBA_fnc_targetEvent;
         tac_baseSpectatorObject setVariable ["tac_baseSpectatorAllowed", false, true];
