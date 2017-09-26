@@ -5,6 +5,7 @@ class CfgFunctions {
             file = "functions";
             //recompile = 1; // Debug - Requires allowFunctionsRecompile = 1; in description.ext
             class baseSpectator;
+            class briefing;
         };
     };
 };
