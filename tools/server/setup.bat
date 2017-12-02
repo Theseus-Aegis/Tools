@@ -8,7 +8,7 @@ rem properly setup Arma 3 Server installation and all files listed in STATIC VAR
 rem STATIC VARIABLES
 rem Arma 3 Steam
 set a3server="C:\SteamCMD\steamapps\common\Arma 3 Server"
-    set symA3dirs=(addons argo curator dll dta expansion heli jets kart mark orange)
+    set symA3dirs=(addons argo curator dll dta expansion heli jets kart mark orange tacops)
     set symA3files=(arma3server.exe arma3server_readme.txt arma3server_x64.exe msvcr100.dll openssl_license.txt steam.dll steam_api.dll steam_api64.dll steam_appid.txt steamclient.dll steamclient64.dll tier0_s.dll tier0_s64.dll vstdlib_s.dll vstdlib_s64.dll)
     set symTACdirs=(keys tac_core tac_server userconfig)
     set symTACfiles=()
