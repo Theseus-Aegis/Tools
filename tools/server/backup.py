@@ -62,10 +62,13 @@ def main():
     date = time.strftime("%Y%m%dT%H%M%S")
     log("Starting backup!")
 
-    tempFiles = os.path.join(TEMP,"files")
-    packedFiles = os.path.join(TEMP,"packed")
+    tempFiles = os.path.join(TEMP, "files")
+    packedFiles = os.path.join(TEMP, "packed")
+
+    # Make sure temporary folder is clean
     if os.path.exists(TEMP):
         shutil.rmtree(TEMP, onerror=remove_readonly)
+
     os.mkdir(TEMP)
     os.mkdir(packedFiles)
 
@@ -225,12 +228,22 @@ def main():
     else:
         log("Skipping move to storage location (removing local backup)")
 
-
-    # Remove temporary folder
-    shutil.rmtree(TEMP, onerror=remove_readonly)
-
-    log("Backup completed!")
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        status = main()
+    except:
+        status = 1
+    finally:
+        # Remove temporary folder
+        if os.path.exists(TEMP):
+            shutil.rmtree(TEMP, onerror=remove_readonly)
+
+    if status == 0:
+        log("Backup SUCCESSFUL!")
+    else:
+        log("Backup FAILED!")
+
+    sys.exit(status)
