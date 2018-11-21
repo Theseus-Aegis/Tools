@@ -16,9 +16,9 @@ ARMA_SERVERS_PATH = "C:\\Theseus\\Arma 3 Servers"
 MYSQLDUMP_PATH = "C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin"
 STORAGE = "D:\\Backup"
 # CONTENTS
-ITEMS = ["C:\\Apache24", "C:\\php7", "C:\\Program Files (x86)\\hMailServer\\Data", "C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Data", "D:\\Theseus\\Arma 3\\Missions Archive", "D:\\Theseus\\Athena", "D:\\Theseus\\TeamSpeak 3 Server", "D:\\Theseus\\www\\drupal", "D:\\Theseus\\www\\resources\\TheseusServices", "D:\\Theseus\\www\\squadxml", "D:\\Theseus\\tac_notes.txt"]
+ITEMS = ["C:\\Apache24", "C:\\php7", "C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Data", "D:\\Theseus\\Arma 3\\Missions Archive", "D:\\Theseus\\Athena", "D:\\Theseus\\TeamSpeak 3 Server", "D:\\Theseus\\www\\drupal", "D:\\Theseus\\www\\resources\\TheseusServices", "D:\\Theseus\\www\\squadxml", "D:\\Theseus\\tac_notes.txt"]
 ARMA_SERVER_ITEMS = ["Apollo", "mpmissions", "apollo.properties", "jni.conf", "jni.dll", "params.cfg", "server.cfg"]
-DATABASES = ["apollo", "apollo_test", "drupal", "hmaildb"]
+DATABASES = ["apollo", "apollo_test", "drupal"]
 # OTHER
 BACKUPS_TO_KEEP = 10
 ##########################
