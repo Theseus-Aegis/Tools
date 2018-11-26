@@ -1,3 +1,4 @@
+
 @echo off
 setlocal EnableDelayedExpansion
 
@@ -126,11 +127,12 @@ echo.
 echo Installing service...
 echo -----------------------------
 nssm install "Arma 3 %server%" "%serversFolder%\%server%\arma3server_x64.exe" -exThreads=7 -enableHT -hugepages -profiles=profiles -par=params.cfg
-nssm set "Arma 3 %server%" Description Arma 3 Server - %server% - Theseus Inc. (runs through nssm)
+nssm set "Arma 3 %server%" Description Runs through nssm.
 nssm set "Arma 3 %server%" Start SERVICE_DELAYED_AUTO_START
 nssm set "Arma 3 %server%" Type SERVICE_INTERACTIVE_PROCESS
-nssm set "Arma 3 %server%" AppStdout %serversFolder%\%server%\profiles\service.log
-nssm set "Arma 3 %server%" AppStderr %serversFolder%\%server%\profiles\service.log
+nssm set "Arma 3 %server%" AppStdin %serversFolder%\%server%\profiles\service_nssm.log
+nssm set "Arma 3 %server%" AppStdout %serversFolder%\%server%\profiles\service_nssm.log
+nssm set "Arma 3 %server%" AppStderr %serversFolder%\%server%\profiles\service_nssm.log
 
 
 rem Parameters file
