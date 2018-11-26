@@ -13,11 +13,11 @@ import stat
 # PATHS
 TEMP = "C:\\Theseus\\Tools\\temp"
 ARMA_SERVERS_PATH = "C:\\Theseus\\Arma 3\\Servers"
-MYSQLDUMP_PATH = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin"
+MYSQLDUMP_PATH = "C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin"
 STORAGE = "C:\\Theseus\\Backup"
 # CONTENTS
-ITEMS = ["C:\\Apache24", "C:\\php7", "C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Data", "C:\\Theseus\\Arma 3\\Missions Archive", "C:\\Theseus\\Athena", "C:\\Theseus\\TeamSpeak 3 Server", "C:\\Theseus\\www\\drupal", "C:\\Theseus\\www\\resources\\TheseusServices", "C:\\Theseus\\www\\squadxml", "C:\\Theseus\\tac_notes.txt"]
-ARMA_SERVER_ITEMS = ["Apollo", "mpmissions", "apollo.properties", "jni.conf", "jni.dll", "params.cfg", "server.cfg"]
+ITEMS = ["C:\\Apache24", "C:\\php7", "C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Data", "C:\\Theseus\\Arma 3\\Missions Archive", "C:\\Theseus\\Athena", "C:\\Theseus\\TeamSpeak 3 Server", "C:\\Theseus\\www\\drupal", "C:\\Theseus\\www\\resources\\TheseusServices", "C:\\Theseus\\www\\squadxml", "C:\\Theseus\\tac_notes.txt"]
+ARMA_SERVER_ITEMS = ["Apollo", "mpmissions", "apollo.properties", "jni.conf", "jni.dll", "jni_x64.dll", "params.cfg", "server.cfg"]
 DATABASES = ["apollo", "apollo_test", "drupal"]
 # OTHER
 BACKUPS_TO_KEEP = 10
