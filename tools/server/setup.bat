@@ -17,7 +17,7 @@ set a3server="C:\SteamCMD\steamapps\common\Arma 3 Server"
     rem profiles
     set cpyA3files=(server.cfg)
 rem Custom servers
-set serversFolder=C:\Theseus\Arma 3 Servers
+set serversFolder=C:\Theseus\Arma 3\Servers
 rem Mod line
 set mods=(tac_core)
 set serverMods=(tac_server)
