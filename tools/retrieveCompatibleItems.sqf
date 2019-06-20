@@ -24,14 +24,8 @@ private _data = []; // [ weapon, [items], weapon, [items], ... ]
 
     // Compatible Magazines
     if (_type == 0) then {
-        // Weapon magazines
-        private _magazines = [_x] call CBA_fnc_compatibleMagazines;
-
-        // Grenade launcher magazines
-        private _muzzles = (getArray (_x >> "muzzles")) apply {toLower _x};
-        {
-            _magazines append ([_x] call CBA_fnc_compatibleMagazines);
-        } forEach (configProperties [_x, "isClass _x && {(toLower (configName _x)) in _muzzles}", true]);
+        // Weapon magazines and all muzzles magazines
+        private _magazines = [_x, true] call CBA_fnc_compatibleMagazines;
 
         // Exclude weapons without compatible magazines
         if !(_magazines isEqualTo []) then {
