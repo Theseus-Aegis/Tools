@@ -144,14 +144,27 @@ echo -mod=%modsCore%>> params.cfg
 if %type%==server (
     echo -serverMod=%serverModsCore%>> params.cfg
     echo -config=server.cfg>> params.cfg
-    echo -loadMissionToMemory>>params.cfg
+    echo -loadMissionToMemory>> params.cfg
+    echo -cfg=basic.cfg>> params.cfg
+    echo -bandwidthAlg=2>> params.cfg
 ) else (
-    echo -client>>params.cfg
-    echo -connect=localhost>>params.cfg
-    echo -password=%password%>>params.cfg
+    echo -client>> params.cfg
+    echo -connect=localhost>> params.cfg
+    echo -password=%password%>> params.cfg
 )
 type params.cfg
 
+rem Network file
+echo.
+echo Creating network parameters file...
+echo -----------------------------
+echo maxMsgSend = 256;>> basic.cfg
+echo maxSizeGuaranteed = 512;>> basic.cfg
+echo maxSizeNonguaranteed = 256;>> basic.cfg
+echo minErrorToSend = 0.001;>> basic.cfg
+echo minErrorToSendNear = 0.01;>> basic.cfg
+echo MaxCustomFileSize = 0;>> basic.cfg
+type basic.cfg
 
 rem Notes
 if %type%==server (
