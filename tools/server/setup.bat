@@ -147,10 +147,12 @@ if %type%==server (
     echo -loadMissionToMemory>> params.cfg
     echo -cfg=basic.cfg>> params.cfg
     echo -bandwidthAlg=2>> params.cfg
+    echo -limitFPS=100>> params.cfg
 ) else (
     echo -client>> params.cfg
     echo -connect=localhost>> params.cfg
     echo -password=%password%>> params.cfg
+    echo -limitFPS=100>> params.cfg
 )
 type params.cfg
 
