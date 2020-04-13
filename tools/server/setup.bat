@@ -166,6 +166,10 @@ echo maxSizeNonguaranteed = 256;>> basic.cfg
 echo minErrorToSend = 0.001;>> basic.cfg
 echo minErrorToSendNear = 0.01;>> basic.cfg
 echo MaxCustomFileSize = 0;>> basic.cfg
+echo class sockets {>> basic.cfg
+echo     maxPacketSize = 1480;>> basic.cfg
+echo     initBandwidth = 6250000; // 50 Mb>> basic.cfg
+echo };>> basic.cfg
 type basic.cfg
 
 rem Notes
