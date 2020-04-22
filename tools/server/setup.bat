@@ -162,7 +162,7 @@ echo.
 echo Creating network parameters file...
 echo -----------------------------
 echo // Based on server network and updated for today's standards>> basic.cfg
-echo MaxMsgSend = 1480; // MTU (default: 128)>> basic.cfg
+echo MaxMsgSend = 1444; // MTU (default: 128)>> basic.cfg
 echo MaxSizeGuaranteed = 1024; // (default: 512)>> basic.cfg
 echo MaxSizeNonguaranteed = 512; // (default: 256)>> basic.cfg
 echo MinBandwidth = 107374182; // ~100 Mb based on server bandwidth (value in bits)>> basic.cfg
@@ -171,8 +171,8 @@ echo MinErrorToSend = 0.001; // (default)>> basic.cfg
 echo MinErrorToSendNear = 0.01; // (default)>> basic.cfg
 echo MaxCustomFileSize = 0; // Disable custom faces>> basic.cfg
 echo class sockets {>> basic.cfg
-echo     maxPacketSize = 1480; // MTU>> basic.cfg
-echo     initBandwidth = 2000000; // 16 Mb (value in bytes)>> basic.cfg
+echo     maxPacketSize = 1444; // MTU (default: 1400)>> basic.cfg
+echo     initBandwidth = 2000000; // 16 Mb (value in bytes, default: 32 Kb)>> basic.cfg
 echo     MinBandwidth = 64000; // 512 Kb lowest DSL (value in bytes)>> basic.cfg
 echo     MaxBandwidth = 2000000; // 16 Mb average DSL (value in bytes)>> basic.cfg
 echo };>> basic.cfg
