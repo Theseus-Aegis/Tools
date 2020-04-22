@@ -105,7 +105,7 @@ echo.
 echo Creating network parameters file...
 echo -----------------------------
 echo // Based on server network and updated for today's standards>> basic.cfg
-echo MaxMsgSend = 1444; // MTU (default: 128)>> basic.cfg
+echo MaxMsgSend = 640; // Maximum amount of messages per frame (default: 128)>> basic.cfg
 echo MaxSizeGuaranteed = 1024; // (default: 512)>> basic.cfg
 echo MaxSizeNonguaranteed = 512; // (default: 256)>> basic.cfg
 echo MinBandwidth = 107374182; // ~100 Mb based on server bandwidth (value in bits)>> basic.cfg
