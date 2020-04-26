@@ -145,7 +145,6 @@ if %type%==server (
     echo -serverMod=%serverModsCore%>> params.cfg
     echo -config=server.cfg>> params.cfg
     echo -loadMissionToMemory>> params.cfg
-    echo -autoInit>> params.cfg
     echo -cfg=basic.cfg>> params.cfg
     echo -bandwidthAlg=2>> params.cfg
     echo -limitFPS=200>> params.cfg
