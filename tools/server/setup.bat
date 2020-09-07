@@ -160,7 +160,7 @@ rem Network file
 echo.
 echo Creating network parameters file...
 echo -----------------------------
-echo // Based on server network and updated for today's standards>> basic.cfg
+echo // Based on server network and updated for today's standards> basic.cfg
 echo MaxMsgSend = 640; // Maximum amount of messages per frame (default: 128)>> basic.cfg
 echo MaxSizeGuaranteed = 1024; // (default: 512)>> basic.cfg
 echo MaxSizeNonguaranteed = 512; // (default: 256)>> basic.cfg
