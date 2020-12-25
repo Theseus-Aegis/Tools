@@ -41,7 +41,7 @@ def main():
 
     locker = []
     with open(args.locker) as f:
-        csvread = csv.reader(f, delimiter=',')
+        csvread = csv.reader(f, delimiter=';')
         next(csvread, None)  # Header
         for row in csvread:
             if row[1]:
@@ -58,15 +58,11 @@ def main():
 
     counts = defaultdict(lambda: [0, []])  # uid => [total, [item names]]
 
-    totalclasses = []
-    totalitems = []
     for remclass, name, price in rem:
         for uid, classname, count in locker:
             if remclass == classname and count != 0:
                 counts[uid][0] += count * price
                 counts[uid][1].append(name)
-                totalclasses.append(f"loadout LIKE '%{remclass}%'")
-                totalitems.append(remclass)
 
     # uid => [total, [items]]
     totalsum = 0
@@ -76,8 +72,15 @@ def main():
 
     print(f"\nTotal refunds: {totalsum}$")
 
-    totalclasses = "\n#OR ".join(set(totalclasses))
-    print(f"\nItems to remove {len(set(totalitems))}:\n{totalclasses}\n{set(totalitems)}")
+    totalitems = []
+    totalitemssql = []
+    for remclass, name, price in rem:
+        if remclass not in totalitems:
+            totalitems.append(remclass)
+            totalitemssql.append(f"loadout LIKE '%{remclass}%'")
+
+    totalitemssql = "\n#OR ".join(set(totalitemssql))
+    print(f"\nItems to remove {len(set(totalitems))}:\n{set(totalitems)}\n{totalitemssql}")
 
     return 0
 
