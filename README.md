@@ -1,2 +1,3 @@
-# Core
-TAC Arma 3 Core
+# Tools
+
+Collection of smaller tools, scripts and helpers for Theseus systems.
