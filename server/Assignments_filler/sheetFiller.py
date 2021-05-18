@@ -1,6 +1,4 @@
-from __future__ import print_function
-
-import os.path
+import os
 import logging
 import sys
 import time
@@ -50,14 +48,17 @@ def writeSheet(service, data, range, amount):
         spreadsheetId=SPREADSHEET_ID, range=range,
         valueInputOption='USER_ENTERED', body=body).execute()
 
-def checker(service, contractName, nid, numberOfComments):
+def checker(service):
     readRange = TEAM_ASSINGMENT_TAB+RANGE_READ
-    oldContractName = contractName
-    oldNID = nid
+    writtenName = readSheet(service, readRange)
+    query = ("SELECT `nid`,`title` FROM drupal.node where title like \"%%%s%%\"" % (writtenName))
+    contractList = get_from_db(query)
+    oldNID = contractList[0][0]
+    oldContractName = contractList[0][1]
     query = ("SELECT `created` FROM drupal.comment where nid=%s ORDER BY created DESC" % (oldNID))
     oldCommentList = get_from_db(query)
     oldLastUpdated = oldCommentList[0][0]
-    oldNumberOfComments = numberOfComments
+    oldNumberOfComments = len(oldCommentList)
     
     logging.info("Starting Checker")
 
@@ -82,11 +83,12 @@ def checker(service, contractName, nid, numberOfComments):
             break
         elif (newNumberOfComments != oldNumberOfComments):
             logging.info("A comment was added!")
+            nameChanged = False
             break
         elif (newLastUpdated != oldLastUpdated):
             logging.info("A comment was modified!")
+            nameChanged = False
             break
-        #print ("looping")
         time.sleep(refreshRate)
     
     filler(service, nameChanged, newContractName, newNID)
@@ -114,8 +116,6 @@ def filler(service, nameChanged, contractName, nid):
         goodListOfNames.extend(sublist)
     commentsRange = TEAM_ASSINGMENT_TAB + "D2:D" + str(numberOfComments+1)
     listOfComments = readSheet(service, commentsRange, 2)
-    print (goodListOfNames)
-    print (listOfComments)
 
     logging.info("Filling List...")
 
@@ -139,39 +139,29 @@ def filler(service, nameChanged, contractName, nid):
         #check user's rank
         query = ("SELECT `rid` FROM drupal.users_roles where uid=%s" % (uid))
         rank = get_from_db(query)[0][0]
-        
-        #check for existing comment
-        #readRange = TEAM_ASSINGMENT_TAB + 'D' + str(row)
-        #localComment = readSheet(service, readRange)
-        localComment = ""
 
         #if new mission, delete comment
         #if name changed spot, get the old comment   
+        localComment = ""
         if nameChanged:
             pass
         elif name in goodListOfNames:
-            print (name)
             index = goodListOfNames.index(name)
             if index < (len(listOfComments)):
                 if listOfComments[index] == []:
                     localComment = ""
                 else:
                     localComment = listOfComments[index][0]
-                print (localComment)
             else:
-                print ("no comment recorded for this name")
-                #pass
+                pass
 
         #if needed, add "recruit"
         if rank == 4:
             if localComment == "":
                 localComment = "Recruit"
-                print ("empty comment")
             elif "Recruit" in localComment:
-                print ("comment contains recruit")
-                #pass
+                pass
             else:
-                print ("Recruit added to comment")
                 localComment = "Recruit, " + localComment
             
         #if no roles were filled, use "Rifleman"
@@ -195,12 +185,9 @@ def filler(service, nameChanged, contractName, nid):
         NextCell = readSheet(service, checkRange, 3)
     
     logging.info("Successfully filled!")
-    
-    checker(service, contractName, nid, numberOfComments)
 
 def main():
     #Setting up the API service
-    #region
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first time.
@@ -221,17 +208,8 @@ def main():
     service = build('sheets', 'v4', credentials=creds, cache_discovery=False)
     readRange = TEAM_ASSINGMENT_TAB+RANGE_READ
     
-    #read new contract name from DB
-    writtenName = readSheet(service, readRange)
-    query = ("SELECT `nid`,`title` FROM drupal.node where title like \"%%%s%%\"" % (writtenName))
-    contractList = get_from_db(query)
-    nid = contractList[0][0]
-    contractName = contractList[0][1]
-    query = ("SELECT `created` FROM drupal.comment where nid=%s ORDER BY created DESC" % (nid))
-    commentList = get_from_db(query)
-    numberOfComments = len(commentList)
-    
-    checker(service, contractName, nid, numberOfComments)
+    while True:
+        checker(service)
 
 if __name__ == '__main__':
     main()
