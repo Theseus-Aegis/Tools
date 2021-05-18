@@ -1,10 +1,9 @@
-#region imports
+import logging
+import os
+
 import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
-
-import logging
-import os
 
 # from dotenv import load_dotenv
 # load_dotenv()
@@ -26,11 +25,10 @@ def post_to_db(query, table_name):
     if is_single_query(query):
         query += ";"
     else:
-        return [["Currapted query"]]
+        return [["Currupted query"]]
 
     try:
         connection = mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
-        # connection = mysql.connector.connect(host='localhost', database='stakebase_core', user='root', password='123456')
         cursor = connection.cursor()
         cursor.execute(query)
         result = cursor.lastrowid
@@ -50,11 +48,10 @@ def get_from_db(query):
     if is_single_query(query):
         query += ";"
     else:
-        return [["Currapted query"]]
+        return [["Currupted query"]]
 
     try:
         connection = mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
-        # connection = mysql.connector.connect(host='localhost', database='appname', user='root', password='123456')
         cursor = connection.cursor(buffered=True)
         cursor.execute(query)
         result = cursor.fetchall()
@@ -69,5 +66,5 @@ def get_from_db(query):
         return result
 
 def is_single_query(query):
-    return not ";" in query
+    return ";" not in query
 	
