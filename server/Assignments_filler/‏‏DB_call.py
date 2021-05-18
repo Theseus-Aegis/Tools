@@ -25,7 +25,7 @@ def post_to_db(query, table_name):
     if is_single_query(query):
         query += ";"
     else:
-        return [["Currupted query"]]
+        return [["Corrupted query"]]
 
     try:
         connection = mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
@@ -48,7 +48,7 @@ def get_from_db(query):
     if is_single_query(query):
         query += ";"
     else:
-        return [["Currupted query"]]
+        return [["Corrupted query"]]
 
     try:
         connection = mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
