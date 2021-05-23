@@ -24,23 +24,30 @@ db_port = "port"
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(message)s",
                     handlers=[logging.FileHandler("filler.log"), logging.StreamHandler()])
 
-connection = mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
+def connect_db():
+    return mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
+
+connection = connect_db()
 
 def get_from_db(query):
     if is_single_query(query):
         query += ";"
     else:
         return [["Currupted query"]]
-
+    
+    global connection
+    if not connection.is_connected():
+        connection = connect_db()
+    
     try:
         cursor = connection.cursor(buffered=True)
         cursor.execute(query)
         result = cursor.fetchall()
         logging.debug("Query executed successfully: ** %s " % (query.replace("\n", " ")))
+        cursor.close()
     except mysql.connector.Error as error:
         logging.error("Failed performing query {}".format(error))
         return str(error)
-    cursor.close()
     return result
 
 def is_single_query(query):
