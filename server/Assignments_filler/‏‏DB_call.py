@@ -5,10 +5,6 @@ import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
 
-# from dotenv import load_dotenv
-# load_dotenv()
-#endregion
-
 # db_host = os.environ['DIGITAL_OCEAN_HOST']
 # db_name = os.environ['DATABASE_NAME']
 # db_user = os.environ['DO_DB_USER']

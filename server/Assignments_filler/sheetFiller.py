@@ -22,7 +22,7 @@ refreshRate = 10
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(message)s",
                     handlers=[logging.FileHandler("filler.log"), logging.StreamHandler()])
 
-def readSheet(service, range, amount = 1):
+def readSheet(service, range, amount=1):
     sheet = service.spreadsheets()
     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
                                 range=range).execute()
@@ -52,11 +52,11 @@ def writeSheet(service, data, range, amount):
 def checker(service):
     readRange = TEAM_ASSINGMENT_TAB+RANGE_READ
     writtenName = readSheet(service, readRange)
-    query = ("SELECT `nid`,`title` FROM drupal.node where title like \"%%%s%%\"" % (writtenName))
+    query = (f"SELECT `nid`,`title` FROM drupal.node where title like \"%{writtenName}%\"")
     contractList = get_from_db(query)
     oldNID = contractList[0][0]
     oldContractName = contractList[0][1]
-    query = ("SELECT `created` FROM drupal.comment where nid=%s ORDER BY created DESC" % (oldNID))
+    query = (f"SELECT `created` FROM drupal.comment where nid={oldNID} ORDER BY created DESC")
     oldCommentList = get_from_db(query)
     oldLastUpdated = oldCommentList[0][0]
     oldNumberOfComments = len(oldCommentList)
@@ -66,13 +66,13 @@ def checker(service):
     while True:
         #read new contract name from DB
         writtenName = readSheet(service, readRange)
-        query = ("SELECT `nid`,`title` FROM drupal.node where title like \"%%%s%%\"" % (writtenName))
+        query = (f"SELECT `nid`,`title` FROM drupal.node where title like \"%{writtenName}%\"")
         contractList = get_from_db(query)
         newNID = contractList[0][0]
         newContractName = contractList[0][1]
 
         #check last updated comment and number of comments
-        query = ("SELECT `created` FROM drupal.comment where nid=%s ORDER BY created DESC" % (newNID))
+        query = (f"SELECT `created` FROM drupal.comment where nid={newNID} ORDER BY created DESC")
         commentList = get_from_db(query)
         newLastUpdated = commentList[0][0]
         newNumberOfComments = len(commentList)
@@ -102,9 +102,9 @@ def filler(service, nameChanged, contractName, nid):
     #fill mission full name
     if nameChanged:
         writeSheet(service, contractName, readRange, 1)
-        logging.info("Filled Mission Name : %s" % (contractName))
+        logging.info(f"Filled Mission Name: {contractName}")
     
-    query = ("SELECT `cid`,`uid`,`subject` FROM drupal.comment where nid=%s ORDER BY cid ASC" % (nid))
+    query = (f"SELECT `cid`,`uid`,`subject` FROM drupal.comment where nid={nid} ORDER BY cid ASC")
     commentList = get_from_db(query)
     numberOfComments = len(commentList)
     row = 2
@@ -126,7 +126,7 @@ def filler(service, nameChanged, contractName, nid):
         subject = comment[2]
         
         #get user's attendence
-        query = ("SELECT `field_attendence_value` FROM drupal.field_data_field_attendence where entity_id=%s" % (cid))
+        query = (f"SELECT `field_attendence_value` FROM drupal.field_data_field_attendence where entity_id={cid}")
         attendence = get_from_db(query)[0][0]
         
         #ignore all comments not marked "yes"
@@ -134,11 +134,11 @@ def filler(service, nameChanged, contractName, nid):
             continue
         
         #get user display name
-        query = ("SELECT `realname` FROM drupal.realname where uid=%s" % (uid))
+        query = (f"SELECT `realname` FROM drupal.realname where uid={uid}")
         name = get_from_db(query)[0][0]
         
         #check user's rank
-        query = ("SELECT `rid` FROM drupal.users_roles where uid=%s" % (uid))
+        query = (f"SELECT `rid` FROM drupal.users_roles where uid={uid}")
         rank = get_from_db(query)[0][0]
 
         #if new mission, delete comment
