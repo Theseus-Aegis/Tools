@@ -21,28 +21,10 @@ db_user = "user"
 db_pass = "password"
 db_port = "port"
 
-def post_to_db(query, table_name):
-    if is_single_query(query):
-        query += ";"
-    else:
-        return [["Currupted query"]]
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(message)s",
+                    handlers=[logging.FileHandler("filler.log"), logging.StreamHandler()])
 
-    try:
-        connection = mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
-        cursor = connection.cursor()
-        cursor.execute(query)
-        result = cursor.lastrowid
-        connection.commit()
-        logging.debug("Query executed successfully: ** %s " % (query.replace("\n", " ")))
-    except mysql.connector.Error as error :
-        connection.rollback() #rollback if any exception occured
-        logging.error("Failed performing query {}".format(error))
-        return str(error)
-    finally:
-        if(connection.is_connected()):
-            connection.close()
-            # logging.debug("MySQL connection is closed")
-        return result
+connection = mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
 
 def get_from_db(query):
     if is_single_query(query):
@@ -51,20 +33,15 @@ def get_from_db(query):
         return [["Currupted query"]]
 
     try:
-        connection = mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
         cursor = connection.cursor(buffered=True)
         cursor.execute(query)
         result = cursor.fetchall()
         logging.debug("Query executed successfully: ** %s " % (query.replace("\n", " ")))
-    except mysql.connector.Error as error :
+    except mysql.connector.Error as error:
         logging.error("Failed performing query {}".format(error))
         return str(error)
-    finally:
-        if(connection.is_connected()):
-            connection.close()
-            # logging.debug("MySQL connection is closed")
-        return result
+    cursor.close()
+    return result
 
 def is_single_query(query):
     return ";" not in query
-	

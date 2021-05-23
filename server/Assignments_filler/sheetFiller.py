@@ -3,6 +3,7 @@ import logging
 import sys
 import time
 
+import DB_call
 from DB_call import get_from_db
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
