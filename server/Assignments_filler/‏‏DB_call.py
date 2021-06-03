@@ -21,7 +21,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(m
                     handlers=[logging.FileHandler("filler.log"), logging.StreamHandler()])
 
 def connect_db():
-    return mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
+    connection = mysql.connector.connect(host=db_host, database=db_name, port=db_port, user=db_user, password=db_pass)
+    connection.autocommit = True
+    return connection
 
 connection = connect_db()
 
