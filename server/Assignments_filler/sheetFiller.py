@@ -210,7 +210,10 @@ def main():
     readRange = TEAM_ASSINGMENT_TAB+RANGE_READ
     
     while True:
+    try:
         checker(service)
+    except (KeyboardInterrupt, SystemExit):
+        return
 
 if __name__ == '__main__':
     main()
