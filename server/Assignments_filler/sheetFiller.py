@@ -48,38 +48,120 @@ def writeSheet(service, data, range, amount):
     result = service.spreadsheets().values().update(
         spreadsheetId=SPREADSHEET_ID, range=range,
         valueInputOption='USER_ENTERED', body=body).execute()
+        
+def paintSheet(service, color):
+    if (color == "red"):
+        redLevel = 0.9
+    elif (color == "black"):
+        redLevel = 0
+    body = {"requests": [{
+        "updateBorders": {
+            "range": { #which cell will get formatted
+                "sheetId": 871598544, #the right tab
+                "startRowIndex": 32,
+                "endRowIndex": 33,
+                "startColumnIndex": 5,
+                "endColumnIndex": 6
+            },
+            "top": {
+                "style": "SOLID",
+                "width": 1,
+                "color": {"red": redLevel},
+            },
+            "bottom": {
+                "style": "SOLID_THICK",
+                "width": 1,
+                "color": {"red": redLevel},
+            },
+            "left": {
+                "style": "SOLID_THICK",
+                "width": 1,
+                "color": {"red": redLevel},
+            },
+            "right": {
+                "style": "SOLID_THICK",
+                "width": 1,
+                "color": {"red": redLevel},
+            },
+        }
+    }]}
+    result = service.spreadsheets().batchUpdate(spreadsheetId=SPREADSHEET_ID, body=body).execute()
 
 def checker(service):
+    isRed = False
     readRange = TEAM_ASSINGMENT_TAB+RANGE_READ
     writtenName = readSheet(service, readRange)
-    query = (f"SELECT `nid`,`title` FROM drupal.node where title like \"%{writtenName}%\"")
+    query = (f"SELECT `nid`,`title` FROM drupal.node where title like \"%{writtenName}%\" ORDER BY nid DESC")
     contractList = get_from_db(query)
-    oldNID = contractList[0][0]
-    oldContractName = contractList[0][1]
+    queryLength = len(contractList)
+    if (queryLength == 0):
+        oldNID = 0
+        oldContractName = "empty name"
+    elif (queryLength > 1):
+        for sublist in contractList:
+            exactName = sublist[1]
+            if (writtenName == exactName):
+                exactIndex = contractList.index(sublist)
+                oldNID = contractList[exactIndex][0]
+                oldContractName = contractList[exactIndex][1]
+                break
+        else:
+            oldNID = contractList[0][0]
+            oldContractName = contractList[0][1]
+    else:
+        oldNID = contractList[0][0]
+        oldContractName = contractList[0][1]
     query = (f"SELECT `created` FROM drupal.comment where nid={oldNID} ORDER BY created DESC")
     oldCommentList = get_from_db(query)
-    oldLastUpdated = oldCommentList[0][0]
     oldNumberOfComments = len(oldCommentList)
-    
+    if (oldNumberOfComments):
+        oldLastUpdated = oldCommentList[0][0]
+    else:
+        oldLastUpdated = 1
     logging.info("Starting Checker")
 
     while True:
         #read new contract name from DB
         writtenName = readSheet(service, readRange)
-        query = (f"SELECT `nid`,`title` FROM drupal.node where title like \"%{writtenName}%\"")
+        query = (f"SELECT `nid`,`title` FROM drupal.node where title like \"%{writtenName}%\" ORDER BY nid DESC")
         contractList = get_from_db(query)
-        newNID = contractList[0][0]
-        newContractName = contractList[0][1]
+        queryLength = len(contractList)
+        if (queryLength == 0):
+            if (not isRed):
+                paintSheet(service, "red")
+                isRed = True
+            time.sleep(refreshRate)
+            continue
+        elif (queryLength > 1):
+            for sublist in contractList:
+                exactName = sublist[1]
+                if (writtenName == exactName):
+                    exactIndex = contractList.index(sublist)
+                    newNID = contractList[exactIndex][0]
+                    newContractName = contractList[exactIndex][1]
+                    nameLog = (f"found exact match among {queryLength} contracts that contain \"{writtenName}\"")
+                    break
+            else:
+                newNID = contractList[0][0]
+                newContractName = contractList[0][1]
+                nameLog = (f"could not find exact match among {queryLength} contracts that contain \"{writtenName}\", choosing the latest...")
+        else:
+            newNID = contractList[0][0]
+            newContractName = contractList[0][1]
+            nameLog = "found single contract and chose it!"
 
         #check last updated comment and number of comments
         query = (f"SELECT `created` FROM drupal.comment where nid={newNID} ORDER BY created DESC")
         commentList = get_from_db(query)
-        newLastUpdated = commentList[0][0]
         newNumberOfComments = len(commentList)
+        if (newNumberOfComments):
+            newLastUpdated = commentList[0][0]
+        else:
+            newLastUpdated = 1
         
         #compare the new and the old data
         if (newContractName != oldContractName):
-            logging.info("New contract name detected!")
+            logging.info(f"New contract name detected! {nameLog}")
             nameChanged = True
             break
         elif (newNumberOfComments != oldNumberOfComments):
@@ -91,10 +173,9 @@ def checker(service):
             nameChanged = False
             break
         time.sleep(refreshRate)
-    
-    filler(service, nameChanged, newContractName, newNID)
+    filler(service, nameChanged, isRed, newContractName, newNID)
 
-def filler(service, nameChanged, contractName, nid):
+def filler(service, nameChanged, isRed, contractName, nid):
     logging.info("Running Filler")
 
     readRange = TEAM_ASSINGMENT_TAB+RANGE_READ
@@ -102,6 +183,8 @@ def filler(service, nameChanged, contractName, nid):
     #fill mission full name
     if nameChanged:
         writeSheet(service, contractName, readRange, 1)
+        if (isRed):
+            paintSheet(service, "black")
         logging.info(f"Filled Mission Name: {contractName}")
     
     query = (f"SELECT `cid`,`uid`,`subject` FROM drupal.comment where nid={nid} ORDER BY cid ASC")
