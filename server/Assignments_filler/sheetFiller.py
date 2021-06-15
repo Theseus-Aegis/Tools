@@ -50,7 +50,7 @@ def writeSheet(service, data, range, amount):
         valueInputOption='USER_ENTERED', body=body).execute()
         
 def paintSheet(service, color):
-    if (color == "red"):
+    if color == "red":
         redLevel = 0.9
     elif (color == "black"):
         redLevel = 0
