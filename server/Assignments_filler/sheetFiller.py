@@ -97,7 +97,7 @@ def checker(service):
     if queryLength == 0:
         oldNID = 0
         oldContractName = "empty name"
-    elif (queryLength > 1):
+    elif queryLength > 1:
         for sublist in contractList:
             exactName = sublist[1]
             if (writtenName == exactName):
