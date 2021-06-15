@@ -153,10 +153,9 @@ def checker(service):
         query = (f"SELECT `created` FROM drupal.comment where nid={newNID} ORDER BY created DESC")
         commentList = get_from_db(query)
         newNumberOfComments = len(commentList)
-        if (newNumberOfComments):
+        newLastUpdated = 1
+        if newNumberOfComments:
             newLastUpdated = commentList[0][0]
-        else:
-            newLastUpdated = 1
         
         #compare the new and the old data
         if (newContractName != oldContractName):
