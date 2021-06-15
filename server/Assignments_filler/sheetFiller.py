@@ -94,7 +94,7 @@ def checker(service):
     query = (f"SELECT `nid`,`title` FROM drupal.node where title like \"%{writtenName}%\" ORDER BY nid DESC")
     contractList = get_from_db(query)
     queryLength = len(contractList)
-    if (queryLength == 0):
+    if queryLength == 0:
         oldNID = 0
         oldContractName = "empty name"
     elif (queryLength > 1):
