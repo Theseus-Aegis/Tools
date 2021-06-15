@@ -162,7 +162,7 @@ def checker(service):
             logging.info(f"New contract name detected! {nameLog}")
             nameChanged = True
             break
-        elif (newNumberOfComments != oldNumberOfComments):
+        elif newNumberOfComments != oldNumberOfComments:
             logging.info("A comment was added!")
             nameChanged = False
             break
