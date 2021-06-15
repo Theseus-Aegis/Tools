@@ -158,7 +158,7 @@ def checker(service):
             newLastUpdated = commentList[0][0]
         
         #compare the new and the old data
-        if (newContractName != oldContractName):
+        if newContractName != oldContractName:
             logging.info(f"New contract name detected! {nameLog}")
             nameChanged = True
             break
