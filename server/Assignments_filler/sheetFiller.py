@@ -114,10 +114,9 @@ def checker(service):
     query = (f"SELECT `created` FROM drupal.comment where nid={oldNID} ORDER BY created DESC")
     oldCommentList = get_from_db(query)
     oldNumberOfComments = len(oldCommentList)
-    if (oldNumberOfComments):
+    oldLastUpdated = 1
+    if oldNumberOfComments:
         oldLastUpdated = oldCommentList[0][0]
-    else:
-        oldLastUpdated = 1
     logging.info("Starting Checker")
 
     while True:
