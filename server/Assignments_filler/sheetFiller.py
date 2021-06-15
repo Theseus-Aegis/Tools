@@ -181,7 +181,7 @@ def filler(service, nameChanged, isRed, contractName, nid):
     #fill mission full name
     if nameChanged:
         writeSheet(service, contractName, readRange, 1)
-        if (isRed):
+        if isRed:
             paintSheet(service, "black")
         logging.info(f"Filled Mission Name: {contractName}")
     
