@@ -166,7 +166,7 @@ def checker(service):
             logging.info("A comment was added!")
             nameChanged = False
             break
-        elif (newLastUpdated != oldLastUpdated):
+        elif newLastUpdated != oldLastUpdated:
             logging.info("A comment was modified!")
             nameChanged = False
             break
