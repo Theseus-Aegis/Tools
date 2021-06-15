@@ -100,7 +100,7 @@ def checker(service):
     elif queryLength > 1:
         for sublist in contractList:
             exactName = sublist[1]
-            if (writtenName == exactName):
+            if writtenName == exactName:
                 exactIndex = contractList.index(sublist)
                 oldNID = contractList[exactIndex][0]
                 oldContractName = contractList[exactIndex][1]
