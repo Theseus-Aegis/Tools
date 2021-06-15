@@ -52,7 +52,7 @@ def writeSheet(service, data, range, amount):
 def paintSheet(service, color):
     if color == "red":
         redLevel = 0.9
-    elif (color == "black"):
+    elif color == "black":
         redLevel = 0
     body = {"requests": [{
         "updateBorders": {
