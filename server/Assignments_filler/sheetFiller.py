@@ -131,7 +131,7 @@ def checker(service):
                 isRed = True
             time.sleep(refreshRate)
             continue
-        elif (queryLength > 1):
+        elif queryLength > 1:
             for sublist in contractList:
                 exactName = sublist[1]
                 if (writtenName == exactName):
