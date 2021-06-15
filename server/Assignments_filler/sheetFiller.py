@@ -126,7 +126,7 @@ def checker(service):
         contractList = get_from_db(query)
         queryLength = len(contractList)
         if queryLength == 0:
-            if (not isRed):
+            if not isRed:
                 paintSheet(service, "red")
                 isRed = True
             time.sleep(refreshRate)
