@@ -22,7 +22,7 @@ refreshRate = 10
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(message)s",
                     handlers=[logging.FileHandler("filler.log"), logging.StreamHandler()])
 
-def readSheet(service, range, amount = 1):
+def readSheet(service, range, amount=1):
     sheet = service.spreadsheets()
     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
                                 range=range).execute()
