@@ -22,7 +22,7 @@ refreshRate = 10
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(message)s",
                     handlers=[logging.FileHandler("filler.log"), logging.StreamHandler()])
 
-def readSheet(service, range, amount=1):
+def readSheet(service, range, amount = 1):
     sheet = service.spreadsheets()
     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
                                 range=range).execute()
@@ -50,9 +50,9 @@ def writeSheet(service, data, range, amount):
         valueInputOption='USER_ENTERED', body=body).execute()
         
 def paintSheet(service, color):
-    if (color == "red"):
+    if color == "red":
         redLevel = 0.9
-    elif (color == "black"):
+    elif color == "black":
         redLevel = 0
     body = {"requests": [{
         "updateBorders": {
@@ -88,94 +88,100 @@ def paintSheet(service, color):
     result = service.spreadsheets().batchUpdate(spreadsheetId=SPREADSHEET_ID, body=body).execute()
 
 def checker(service):
+    #defult values
     isRed = False
+    nameChanged = False
     readRange = TEAM_ASSINGMENT_TAB+RANGE_READ
+
+    #set up the "old" values to compare with later
     writtenName = readSheet(service, readRange)
     query = (f"SELECT `nid`,`title` FROM drupal.node where title like \"%{writtenName}%\" ORDER BY nid DESC")
     contractList = get_from_db(query)
     queryLength = len(contractList)
-    if (queryLength == 0):
+    if queryLength == 0: #if the written name is invalid (typo/no contract matches it)
         oldNID = 0
         oldContractName = "empty name"
-    elif (queryLength > 1):
-        for sublist in contractList:
+    elif queryLength > 1: #if more than 1 contract contains the written name
+        for sublist in contractList: #check for exact matches
             exactName = sublist[1]
-            if (writtenName == exactName):
+            if writtenName == exactName:
                 exactIndex = contractList.index(sublist)
                 oldNID = contractList[exactIndex][0]
                 oldContractName = contractList[exactIndex][1]
                 break
-        else:
+        else: #if no exact matches were found
             oldNID = contractList[0][0]
             oldContractName = contractList[0][1]
-    else:
+    else: #if there is a single contract with the written name
         oldNID = contractList[0][0]
         oldContractName = contractList[0][1]
+    
+    #check last updated comment and number of comments
     query = (f"SELECT `created` FROM drupal.comment where nid={oldNID} ORDER BY created DESC")
     oldCommentList = get_from_db(query)
     oldNumberOfComments = len(oldCommentList)
-    if (oldNumberOfComments):
+    oldLastUpdated = 1
+    if oldNumberOfComments:
         oldLastUpdated = oldCommentList[0][0]
-    else:
-        oldLastUpdated = 1
     logging.info("Starting Checker")
 
     while True:
-        #read new contract name from DB
+        #read new data
         writtenName = readSheet(service, readRange)
         query = (f"SELECT `nid`,`title` FROM drupal.node where title like \"%{writtenName}%\" ORDER BY nid DESC")
         contractList = get_from_db(query)
         queryLength = len(contractList)
-        if (queryLength == 0):
-            if (not isRed):
+        if queryLength == 0: #if name is invalid - mark the cell in red and stop the current loop
+            if not isRed:
                 paintSheet(service, "red")
                 isRed = True
             time.sleep(refreshRate)
             continue
-        elif (queryLength > 1):
+        elif queryLength > 1:
             for sublist in contractList:
                 exactName = sublist[1]
-                if (writtenName == exactName):
+                if writtenName == exactName:
                     exactIndex = contractList.index(sublist)
                     newNID = contractList[exactIndex][0]
                     newContractName = contractList[exactIndex][1]
-                    nameLog = (f"found exact match among {queryLength} contracts that contain \"{writtenName}\"")
+                    nameLog = (f"Found exact match among {queryLength} contracts that contain \"{writtenName}\"")
                     break
             else:
                 newNID = contractList[0][0]
                 newContractName = contractList[0][1]
-                nameLog = (f"could not find exact match among {queryLength} contracts that contain \"{writtenName}\", choosing the latest...")
+                nameLog = (f"Could not find exact match among {queryLength} contracts that contain \"{writtenName}\", choosing the latest...")
         else:
             newNID = contractList[0][0]
             newContractName = contractList[0][1]
-            nameLog = "found single contract and chose it!"
+            nameLog = "Found single contract and chose it!"
 
-        #check last updated comment and number of comments
         query = (f"SELECT `created` FROM drupal.comment where nid={newNID} ORDER BY created DESC")
         commentList = get_from_db(query)
         newNumberOfComments = len(commentList)
-        if (newNumberOfComments):
+        newLastUpdated = 1
+        if newNumberOfComments:
             newLastUpdated = commentList[0][0]
-        else:
-            newLastUpdated = 1
+        
+        #make sure the cell is not marked red once the contract name is valid, even if its the same as the old name
+        if isRed:
+            paintSheet(service, "black")
+            isRed = False
         
         #compare the new and the old data
-        if (newContractName != oldContractName):
+        if newContractName != oldContractName:
             logging.info(f"New contract name detected! {nameLog}")
             nameChanged = True
             break
-        elif (newNumberOfComments != oldNumberOfComments):
+        elif newNumberOfComments != oldNumberOfComments:
             logging.info("A comment was added!")
-            nameChanged = False
             break
-        elif (newLastUpdated != oldLastUpdated):
+        elif newLastUpdated != oldLastUpdated:
             logging.info("A comment was modified!")
-            nameChanged = False
             break
         time.sleep(refreshRate)
-    filler(service, nameChanged, isRed, newContractName, newNID)
+    filler(service, nameChanged, newContractName, newNID)
 
-def filler(service, nameChanged, isRed, contractName, nid):
+def filler(service, nameChanged, contractName, nid):
     logging.info("Running Filler")
 
     readRange = TEAM_ASSINGMENT_TAB+RANGE_READ
@@ -183,16 +189,14 @@ def filler(service, nameChanged, isRed, contractName, nid):
     #fill mission full name
     if nameChanged:
         writeSheet(service, contractName, readRange, 1)
-        if (isRed):
-            paintSheet(service, "black")
         logging.info(f"Filled Mission Name: {contractName}")
     
+    #save a list of the current comments
     query = (f"SELECT `cid`,`uid`,`subject` FROM drupal.comment where nid={nid} ORDER BY cid ASC")
     commentList = get_from_db(query)
     numberOfComments = len(commentList)
     row = 2
     
-    #save a list of the current comments
     nameRange = TEAM_ASSINGMENT_TAB + "B2:B" + str(numberOfComments+1)
     badListOfNames = readSheet(service, nameRange, 2)
     goodListOfNames = []
@@ -225,7 +229,7 @@ def filler(service, nameChanged, isRed, contractName, nid):
         rank = get_from_db(query)[0][0]
 
         #if new mission, delete comment
-        #if name changed spot, get the old comment   
+        #if name changed spot, get the old comment
         localComment = ""
         if nameChanged:
             pass
@@ -252,6 +256,7 @@ def filler(service, nameChanged, isRed, contractName, nid):
         if subject == "(No subject)":
             subject = "Rifleman"
 
+        #place comment in the table
         data = [name, subject, localComment]
         writeRange = TEAM_ASSINGMENT_TAB + 'B' + str(row) + ":D" + str(row)
         writeSheet(service, data, writeRange, 3)
@@ -290,13 +295,12 @@ def main():
             token.write(creds.to_json())
 
     service = build('sheets', 'v4', credentials=creds, cache_discovery=False)
-    readRange = TEAM_ASSINGMENT_TAB+RANGE_READ
     
     while True:
-    try:
-        checker(service)
-    except (KeyboardInterrupt, SystemExit):
-        return
+        try:
+            checker(service)
+        except (KeyboardInterrupt, SystemExit):
+            return
 
 if __name__ == '__main__':
     main()
