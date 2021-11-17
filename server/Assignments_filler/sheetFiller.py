@@ -14,7 +14,7 @@ from google.oauth2.credentials import Credentials
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # The ID and range of a sample spreadsheet.
-SPREADSHEET_ID = '1W-C0ozCqXaphvQe1Cz1IFPYwvgO_MXpn1BLKcdI-n6o'
+SPREADSHEET_ID = '1kvTsZ9rlfJH1AYLsppqjTv8uJMza4YUf3jq7fZZtl5E'
 TEAM_ASSINGMENT_TAB = 'Team Assignments!'
 RANGE_READ = 'F33'
 refreshRate = 10
