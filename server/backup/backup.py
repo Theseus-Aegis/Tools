@@ -25,12 +25,14 @@ ARMA_SERVER_ITEMS = ["Apollo", "mpmissions", "apollo.properties", "jni.conf", "j
 DATABASES = ["apollo", "apollo_test", "drupal"]
 # OTHER
 BACKUPS_TO_KEEP = 10
+BACKUPS_TO_KEEP_GDRIVE = 5
+GDRIVE_FOLDER_ID = "1dxY569UQP_84eesABDYIZ-vzxS1wVCcS"
 
 
 def log(text):
     print(text)
     with open("backup.log", "a") as logfile:
-        logfile.write("[{}] {}\n".format(time.strftime("%Y%m%dT%H%M%S"), text))
+        logfile.write(f"[{time.strftime('%Y%m%dT%H%M%S')}] {text}\n")
 
 
 def remove_readonly(function, path, exc):
@@ -51,10 +53,7 @@ def main():
                         help="backup only specific item")
     parser.add_argument("-sdb", "--specificdatabase", default=False, type=str, required=False,
                         help="backup only specific database")
-    keep_parser = parser.add_mutually_exclusive_group(required=False)
-    keep_parser.add_argument("-k", "--keep", dest="keep", action="store_true", help="keep backup locally")
-    keep_parser.add_argument("-nk", "--no-keep", dest="keep", action="store_false", help="remove local backup")
-    parser.set_defaults(keep=True)
+    parser.add_argument("-k", "--keep", default=False, action="store_true", help="keep backup locally")
     args = parser.parse_args()
 
     items = ITEMS
@@ -64,6 +63,13 @@ def main():
     databases = DATABASES
     if args.specificdatabase:
         databases = [args.specificdatabase]
+
+    ###
+    # Import optional pip packages
+    use_gauth = os.path.isfile("settings.yaml")
+    if use_gauth:
+        from pydrive2.auth import GoogleAuth
+        from pydrive2.drive import GoogleDrive
 
     ###
     # Prepare temporary folders and date
@@ -86,7 +92,7 @@ def main():
 
     for item in items:
         if os.path.exists(item):
-            log("- {}".format(item))
+            log(f"- {item}")
 
             # Copy to temporary folder to prevent access issues
             os.mkdir(tempFiles)
@@ -102,7 +108,7 @@ def main():
             if "." in name:
                 name = name.rsplit(".", 1)[0]
 
-            archive = shutil.make_archive("{}_{}".format(date, name), "zip", tempFiles)
+            archive = shutil.make_archive(f"{date}_{name}", "zip", tempFiles)
             shutil.move(archive, packedFiles)
 
             # Remove temporary folder to allow copytree to create it again
@@ -114,7 +120,7 @@ def main():
     if os.path.exists(ARMA_SERVERS_PATH):
         for serverDir in os.listdir(ARMA_SERVERS_PATH):
             serverPath = os.path.join(ARMA_SERVERS_PATH, serverDir)
-            log("- {}".format(serverPath))
+            log(f"- {serverPath}")
 
             os.mkdir(tempFiles)
             for item in ARMA_SERVER_ITEMS:
@@ -130,9 +136,9 @@ def main():
 
             # Zip it up and move it to another folder
             name = ARMA_SERVERS_PATH[3:].replace(" ", "_").replace("\\", "_")
-            name = "{}_{}".format(name, serverDir).lower()
+            name = f"{name}_{serverDir}".lower()
 
-            archive = shutil.make_archive("{}_{}".format(date, name), "zip", tempFiles)
+            archive = shutil.make_archive(f"{date}_{name}", "zip", tempFiles)
             shutil.move(archive, packedFiles)
 
             # Remove temporary folder to allow copytree to create it again
@@ -145,20 +151,20 @@ def main():
 
         os.mkdir(tempFiles)
         for database in databases:
-            log("- {}".format(database))
+            log(f"- {database}")
 
             subprocess.call([
-                "{}\\mysqldump".format(MYSQLDUMP_PATH),
+                f"{MYSQLDUMP_PATH}\\mysqldump",
                 "-u",
-                "{}".format(args.databaseuser),
-                "-p{}".format(args.databasepassword),
-                "{}".format(database),
+                f"{args.databaseuser}",
+                f"-p{args.databasepassword}",
+                f"{database}",
                 ">",
-                "{}\\{}.sql".format(tempFiles, database)
+                f"{tempFiles}\\{database}.sql"
             ], shell=True)
 
         # Zip it up and move it to another folder
-        archive = shutil.make_archive("{}_mysql_dump".format(date), "zip", tempFiles)
+        archive = shutil.make_archive(f"{date}_mysql_dump", "zip", tempFiles)
         shutil.move(archive, packedFiles)
 
         # Remove temporary folder to allow copytree to create it again
@@ -176,7 +182,7 @@ def main():
         ftp.login(args.ftpuser, args.ftppassword)
 
         # Upload files
-        folder = "{}_theseus_backup".format(date)
+        folder = f"{date}_theseus_backup"
 
         if folder not in ftp.nlst():
             ftp.mkd(folder)
@@ -193,10 +199,10 @@ def main():
         folders.sort()
         amountToRemove = len(folders) - BACKUPS_TO_KEEP - 4  # 4 = [".", "..", ".banner", ".ftpquota"]
         if amountToRemove > 0:
-            log("- Removing {} old backup(s)...".format(amountToRemove))
+            log(f"- Removing {amountToRemove} old backup(s)...")
 
             for folder in folders[:amountToRemove]:
-                log("  - {}".format(folder))
+                log(f"  - {folder}")
 
                 ftp.cwd(folder)
                 for file in ftp.nlst():
@@ -210,6 +216,54 @@ def main():
         log("Skipping upload to FTP server (no user and password)")
 
     ###
+    # Upload to Google Drive
+    if use_gauth:
+        log("Uploading to Google Drive...")
+
+        # Establish Google Drive connection
+        gauth = GoogleAuth()
+        drive = GoogleDrive(gauth)
+
+        # Upload files
+        gfolder = drive.CreateFile({
+            "title": f"{date}_theseus_backup",
+            "mimeType": "application/vnd.google-apps.folder",
+            "parents": [{
+                "id": GDRIVE_FOLDER_ID,
+            }]
+        })
+        gfolder.Upload()
+
+        for file in os.listdir(packedFiles):
+            filePath = os.path.join(packedFiles, file)
+            log(f"- {filePath}")
+
+            gfile = drive.CreateFile({
+                "parents": [{
+                    "id": gfolder["id"],
+                }]
+            })
+            gfile.SetContentFile(filePath)
+            gfile.Upload()
+
+        # Remove oldest backup when there are more than BACKUPS_TO_KEEP_GDRIVE
+        gfolders = drive.ListFile({
+            "q": f"\"{GDRIVE_FOLDER_ID}\" in parents and trashed=False",
+        }).GetList()
+        gfolders = sorted(gfolders, key=lambda item: item["title"])
+        amountToRemove = len(gfolders) - BACKUPS_TO_KEEP_GDRIVE
+        if amountToRemove > 0:
+            log(f"- Removing {amountToRemove} old backup(s)...")
+
+            for gfolder in gfolders[:amountToRemove]:
+                log(f"  - {gfolder['title']}")
+                gfolder.Delete()
+        else:
+            log("- Skipping removal of old backups (not enough of them)")
+    else:
+        log("Skipping upload to Google Drive (no authentication)")
+
+    ###
     # Move to specified storage location or remove
     if args.keep:
         log("Moving to storage location...")
@@ -217,7 +271,7 @@ def main():
         if not os.path.exists(STORAGE):
             os.mkdir(STORAGE)
 
-        folder = "{}\\{}_theseus_backup".format(STORAGE, date)
+        folder = f"{STORAGE}\\{date}_theseus_backup"
         shutil.move(packedFiles, folder)
 
         # Remove oldest backup when there are more than BACKUPS_TO_KEEP
@@ -225,10 +279,10 @@ def main():
         folders.sort()
         amountToRemove = len(folders) - BACKUPS_TO_KEEP
         if amountToRemove > 0:
-            log("- Removing {} old backup(s)...".format(amountToRemove))
+            log(f"- Removing {amountToRemove} old backup(s)...")
 
             for folder in folders[:amountToRemove]:
-                log("--- {}".format(folder))
+                log(f"--- {folder}")
                 shutil.rmtree(os.path.join(STORAGE, folder), onerror=remove_readonly)
         else:
             log("- Skipping removal of old backups (not enough of them)")

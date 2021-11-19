@@ -58,3 +58,8 @@ texHeaders.bin
 
 # Tools temporary files
 tools/temp
+
+# Python venv
+venv
+
+client_secrets.json
