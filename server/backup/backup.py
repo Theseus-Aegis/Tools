@@ -230,7 +230,7 @@ def main():
             "mimeType": "application/vnd.google-apps.folder",
             "parents": [{
                 "id": GDRIVE_FOLDER_ID,
-            }]
+            }],
         })
         gfolder.Upload()
 
@@ -239,9 +239,10 @@ def main():
             log(f"- {filePath}")
 
             gfile = drive.CreateFile({
+                "title": file,
                 "parents": [{
                     "id": gfolder["id"],
-                }]
+                }],
             })
             gfile.SetContentFile(filePath)
             gfile.Upload()
