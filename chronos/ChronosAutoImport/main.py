@@ -15,9 +15,9 @@ GOOGLE_DOCS_URL = "https://docs.google.com/spreadsheets/d/1DJUc0hzYLLtpapYyJCLmw
 
 if __name__ == "__main__":
 
-    print("Downloading from google docs...")
+    print("Downloading from Google Sheets...")
     res = requests.get(GOOGLE_DOCS_URL)
-    assert res.status_code == 200, 'Wrong status code'
+    assert res.status_code == 200, "Failed to download item list"
 
     print("Saving file...")
     with open(f"raw_{CHRONOS_NAME}", "wb") as fp:
@@ -62,7 +62,7 @@ if __name__ == "__main__":
                 print("MISMATCH IN NUMBER OF DONWLOADED AND NUMBER OF AFFECTED LINES !")
                 print("\tCONFIRM COMMIT ? Y/[N]")
 
-                if input() not in ["y", "Y"]:
+                if input().lower() != "y":
                     print("Exiting...")
                     input("Press any key to continiue...")
                     exit(1)

@@ -1,4 +1,5 @@
 ### Import by Script
+
 - **FIRST TIME:**
     - navigate to `C:\Theseus\Tools\ChronosAutoImport`
     - **right** click on `runImport.bat` and select `Send To -> Desktop (create a shortcut)`
@@ -14,9 +15,10 @@
 - When prompted input your credentials for DB access
 - Verify that number from output of "GOT *XYZ* ITEMS" and "AFFECTED *XYZ* LINES" match
   - If they do not, procced at your own risk or do manual import and message Ian with problem
-- Double check correct `items_list` table via MySql Workbench
+- Double check correct `items_list` table via MySQL Workbench
 
-##### Notes:
+##### Notes
+
 - Script params are located in `C:\Theseus\Tools\ChronosAutoImport\main.py`
   - `CHRONOS_LOCATION` and `CHRONOS_NAME` should point to location where .sql script expects .csv file
   - `SCRIPT_PATH` should point to path to .sql script (in **one command per line** format)
