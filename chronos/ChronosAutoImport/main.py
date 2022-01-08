@@ -59,7 +59,7 @@ if __name__ == "__main__":
             print(f"\tAFFECTED {linesAffected} LINES")
 
             if linesAffected != linesDown:
-                print("MISMATCH IN NUMBER OF DONWLOADED AND NUMBER OF AFFECTED LINES !")
+                print("MISMATCH IN NUMBER OF DOWNLOADED AND NUMBER OF AFFECTED LINES !")
                 print("\tCONFIRM COMMIT ? Y/[N]")
 
                 if input().lower() != "y":
