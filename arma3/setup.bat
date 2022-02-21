@@ -11,7 +11,7 @@ rem Arma 3 Steam
 set a3server="C:\SteamCMD\steamapps\common\Arma 3 Server"
     set symA3dirs=(addons aow argo curator dll dta enoch expansion heli jets kart mark orange tacops tank)
     set symA3files=(arma3server.exe arma3server_readme.txt arma3server_x64.exe msvcr100.dll openssl_license.txt steam.dll steam_api.dll steam_api64.dll steam_appid.txt steamclient.dll steamclient64.dll tier0_s.dll tier0_s64.dll vstdlib_s.dll vstdlib_s64.dll)
-    set symTACdirs=(keys tac_core tac_server userconfig)
+    set symTACdirs=(keys mods userconfig)
     set symTACfiles=()
     rem basic.cfg
     set cpyA3dirs=(mpmissions)
@@ -19,11 +19,6 @@ set a3server="C:\SteamCMD\steamapps\common\Arma 3 Server"
     set cpyA3files=(server.cfg)
 rem Custom servers
 set serversFolder=C:\Theseus\Arma 3\Servers
-rem Mod line
-set mods=(tac_core)
-set serverMods=(tac_server)
-set modsPreload=(tac_core\@CBA_A3 tac_core\@ace tac_core\@tac_mods)
-set headlessServerMods=()
 
 cd /d %serversFolder%
 
@@ -93,33 +88,8 @@ rem Build -mod and -serverMod parameters
 echo.
 echo Building modline parameters...
 echo -----------------------------
-rem Mods needed to be loaded first
-for %%x in %modsPreload% do (
-    set modsCore=!modsCore!%%x;
-)
-rem Mods
-for %%x in %mods% do (
-    for /d %%i in (%%x\*) do (
-        set same=""
-        rem Requires delayed expansion, separate variable to ensure it doesn't get run multiple times
-        for %%n in %modsPreload% do if %%i==%%n set same=true
-        if !same!=="" set modsCore=!modsCore!%%i;
-    )
-)
-rem Server-only mods on server and selected server mods on headless
-if %type%==server (
-    for %%x in %serverMods% do (
-        for /d %%i in (%%x\*) do (
-            set serverModsCore=!serverModsCore!%%i;
-        )
-    )
-    echo -serverMod=!serverModsCore!
-) else (
-    for %%x in %headlessServerMods% do (
-        set modsCore=!modsCore!%%x;
-    )
-)
-echo -mod=%modsCore%
+echo DEPRECATED
+echo Use swifty_manage.py to retrieve modline
 
 
 rem rem Install service
@@ -140,9 +110,9 @@ echo.
 echo Creating startup parameters file...
 echo -----------------------------
 echo -port=%port%> params.cfg
-echo -mod=%modsCore%>> params.cfg
+echo -mod=>> params.cfg
 if %type%==server (
-    echo -serverMod=%serverModsCore%>> params.cfg
+    echo -serverMod=>> params.cfg
     echo -config=server.cfg>> params.cfg
     echo -loadMissionToMemory>> params.cfg
     echo -cfg=basic.cfg>> params.cfg
