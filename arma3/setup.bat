@@ -11,7 +11,7 @@ rem Arma 3 Steam
 set a3server="C:\SteamCMD\steamapps\common\Arma 3 Server"
     set symA3dirs=(addons aow argo curator dll dta enoch expansion heli jets kart mark orange tacops tank)
     set symA3files=(arma3server.exe arma3server_readme.txt arma3server_x64.exe msvcr100.dll openssl_license.txt steam.dll steam_api.dll steam_api64.dll steam_appid.txt steamclient.dll steamclient64.dll tier0_s.dll tier0_s64.dll vstdlib_s.dll vstdlib_s64.dll)
-    set symTACdirs=(keys mods userconfig)
+    set symTACdirs=(keys mods mods_dev userconfig)
     set symTACfiles=()
     rem basic.cfg
     set cpyA3dirs=(mpmissions)
