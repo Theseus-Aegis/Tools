@@ -118,24 +118,6 @@ def publish(path):
                 print(f"  {x}")
                 shutil.rmtree(x)
 
-    # Clean copy root files
-    print("copy root files")
-    removed = []
-    for file in publish_mods.glob("*.*"):
-        file.unlink()
-        removed.append(file.name)
-
-    for file in Path(MODS_FOLDER).glob("*.*"):
-        shutil.copy2(file, path / file)
-        print(f"  {file} -> {path / file} {'(clean)' if file.name in removed else '(new)'}")
-
-        if file.name in removed:
-            removed.remove(file.name)
-
-    print("cleanup root files")
-    for rem in removed:
-        print(f"  {rem}")
-
     # TODO Handle server keys
     # ???
 
