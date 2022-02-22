@@ -2,6 +2,7 @@
 
 import argparse
 import ctypes
+import filecmp
 import json
 import os
 import shutil
@@ -9,13 +10,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-MODS_PATH = "mods"
-BUILD_PATH = "build"
-PUBLISH_PATH = "publish"
+MODS_FOLDER = "mods"
+BUILD_FOLDER = "build"
+PUBLISH_PATH = "../production"
 PRELOAD_MODS = ["@cba_a3", "@ace", "@tac_mods"]
 
-DEFAULT_SWIFTY_CLI = Path(__file__).parent / "swifty-cli.exe"
-DEFAULT_OUTPUT = f"{os.path.splitext(__file__)[0]}_cfg.log"
+SWIFTY_CLI = Path(__file__).parent / "swifty-cli.exe"
+OUTPUT_FILE = f"{os.path.splitext(__file__)[0]}_cfg.log"
 
 
 def can_make_symlinks():
@@ -30,54 +31,8 @@ def can_make_symlinks():
         return False
 
 
-def publish(repo):
-    # TODO
-    # Make a clean copy of all mods/
-    # Make a clean copy of build/<repo>
-
-    # TODO Handle server keys
-    # ???
-
-    build = Path(BUILD_PATH, repo)
-    publish = Path(PUBLISH_PATH, repo)
-
-    # Check if build exists
-    if not build.exists():
-        print(f"error: build '{build}' not found!")
-        return 1
-
-    # Prepare publish folder
-    if publish.exists():
-        print(f"remove old publish '{publish}'")
-        shutil.rmtree(publish)
-    elif not Path(PUBLISH_PATH).exists():
-        print(f"prepare publish '{PUBLISH_PATH}'")
-        os.mkdir(PUBLISH_PATH)
-
-    # Copy with preserving symlinks
-    print(f"publish '{build}' -> '{publish}'")
-    shutil.copytree(build, publish, symlinks=True)
-
-
-def build(repo, repojson, swifty_cli, output):
-    # Lower-case all mod folders, their 'addons' and PBO files
-    print("lower-case")
-    for root, dirs, files in os.walk(MODS_PATH, topdown=False):
-        def _to_lower(src, dst):
-            if src.as_posix() != dst.as_posix():
-                print(f"  {src} -> {dst}")
-                os.rename(src, dst)
-
-        for d in dirs:
-            if d.startswith("@") or d.lower() == "addons":
-                _to_lower(Path(root, d), Path(root, d.lower()))
-        for f in files:
-            if os.path.splitext(f)[1] == ".pbo":
-                _to_lower(Path(root, f), Path(root, f.lower()))
-
-    build = Path(BUILD_PATH, repo)
-
-    # Parse JSON for mod folders in use
+# Parse JSON for mod folders in use
+def parse_swifty_json(repojson):
     print(f"parse '{repojson}'")
     modfolders = dict()
     with open(repojson, "r", encoding="utf-8") as repodata:
@@ -85,7 +40,7 @@ def build(repo, repojson, swifty_cli, output):
         mods = data["requiredMods"] + data["optionalMods"]
         for mod in mods:
             enabled = mod.get("enabled", True) and mod.get("Enabled", True)
-            modpath = Path(MODS_PATH, mod["modName"])
+            modpath = Path(MODS_FOLDER, mod["modName"])
 
             print(f"  {modpath.name} -> {modpath.parent} {'' if enabled else '(disabled)'}")
             if not enabled:
@@ -98,6 +53,124 @@ def build(repo, repojson, swifty_cli, output):
             else:
                 modfolders[modpath.name] = modpath.parent
 
+    return modfolders
+
+
+def publish(path):
+    publish_build = Path(path, BUILD_FOLDER)
+    publish_mods = Path(path, MODS_FOLDER)
+    build = Path(BUILD_FOLDER)
+
+    # Prepare publish folders
+    os.makedirs(publish_build, exist_ok=True)
+    os.makedirs(publish_mods, exist_ok=True)
+
+    # Make a clean copy of all built repos
+    # Prepare all mod folder data
+    modfolders = dict()
+    for publish_build_repo in publish_build.iterdir():
+        print(f"remove old published build '{publish_build_repo}'")
+        shutil.rmtree(publish_build_repo)
+
+    for build_repo in build.iterdir():
+        publish_build_repo = publish_build / build_repo.name
+        print(f"publish build '{build_repo}' -> '{publish_build_repo}'")
+        # Copy with preserving symlinks
+        shutil.copytree(build_repo, publish_build_repo, symlinks=True)
+
+        repojson = Path(f"{publish_build_repo.name}.json")
+        if not repojson.exists():
+            print(f"error: repository file '{repojson}' does not exist!")
+            return 1
+        modfolders |= parse_swifty_json(repojson)
+
+    # Copy mods that changed
+    print("copy mods")
+    for modname, modpath in modfolders.items():
+        mod = modpath / modname
+        publish_mod = path / modpath / modname
+
+        mod_srf = mod / "mod.srf"
+        publish_mod_srf = publish_mod / "mod.srf"
+        equal = mod_srf.exists() and publish_mod_srf.exists()
+        if equal:
+            equal = filecmp.cmp(mod_srf, publish_mod_srf)
+
+        if not equal:
+            cleaned = False
+            if publish_mod.exists():
+                shutil.rmtree(publish_mod)
+                cleaned = True
+
+            print(f"  {mod} -> {publish_mod} {'(clean)' if cleaned else '(new)'}")
+            os.makedirs(publish_mod.parent, exist_ok=True)
+            shutil.copytree(mod, publish_mod)
+
+    # Remove removed mods
+    print("cleanup mods")
+    modfolder_names = set([d.name for d in modfolders.values()])
+    for root, dirs, files in os.walk(publish_mods):
+        dirs[:] = [d for d in dirs if d not in modfolders]
+
+        for d in dirs:
+            if d not in modfolder_names:
+                x = Path(root, d)
+                print(f"  {x}")
+                shutil.rmtree(x)
+
+    # Clean copy root files
+    print("copy root files")
+    removed = []
+    for file in publish_mods.glob("*.*"):
+        file.unlink()
+        removed.append(file.name)
+
+    for file in Path(MODS_FOLDER).glob("*.*"):
+        shutil.copy2(file, path / file)
+        print(f"  {file} -> {path / file} {'(clean)' if file.name in removed else '(new)'}")
+
+        if file.name in removed:
+            removed.remove(file.name)
+
+    print("cleanup root files")
+    for rem in removed:
+        print(f"  {rem}")
+
+    # TODO Handle server keys
+    # ???
+
+    return 0
+
+
+def build(repo, swifty_cli, output):
+    if repo.endswith(".json"):
+        repo = os.path.splitext(repo)[0]
+    repojson = Path(f"{repo}.json")
+
+    print(f"repository: {repo}")
+
+    if not repojson.exists():
+        print(f"error: repository file '{repojson}' does not exist!")
+        return 1
+
+    # Lower-case all mod folders, their 'addons' and PBO files
+    print("lower-case")
+    for root, dirs, files in os.walk(MODS_FOLDER, topdown=False):
+        def _to_lower(src, dst):
+            if src.as_posix() != dst.as_posix():
+                print(f"  {src} -> {dst}")
+                os.rename(src, dst)
+
+        for d in dirs:
+            if d.startswith("@") or d.lower() == "addons":
+                _to_lower(Path(root, d), Path(root, d.lower()))
+        for f in files:
+            if os.path.splitext(f)[1] == ".pbo":
+                _to_lower(Path(root, f), Path(root, f.lower()))
+
+    build = Path(BUILD_FOLDER, repo)
+    modfolders = parse_swifty_json(repojson)
+
     # Prepare build folder
     if build.exists():
         print(f"remove old build '{build}'")
@@ -109,7 +182,7 @@ def build(repo, repojson, swifty_cli, output):
     # Generate Swifty files (mod.srf and repo.json)
     threads = os.cpu_count() // 2
     swifty_run = [
-        str(swifty_cli),
+        str(swifty_cli.as_posix()),
         "create",
         str(repojson.as_posix()),
         str(build.as_posix()),
@@ -130,11 +203,11 @@ def build(repo, repojson, swifty_cli, output):
                 swifty_exception = True
     except (OSError, ValueError, subprocess.SubprocessError) as e:
         print(f"error: swifty generating failed! {e}")
-        return 1
+        return 2
 
     if swifty_exception:
         print("error: swifty generating failed! see exception above")
-        return 1
+        return 2
 
     # Check the list of mods and prioritize preload mods
     print("check mod list")
@@ -155,7 +228,7 @@ def build(repo, repojson, swifty_cli, output):
     mods = list(filter(None, mods))
 
     if mod_errors != 0:
-        return 2
+        return 3
 
     print("symlink")
     modline = ""
@@ -182,37 +255,39 @@ def build(repo, repojson, swifty_cli, output):
 
 
 def main():
+    min_python = (3, 9)
+    if sys.version_info < min_python:
+        sys.exit(f"Python {min_python[0]}.{min_python[1]} or later is required.")
+
     # Parse arguments
     parser = argparse.ArgumentParser(description="Swifty Modpack Manager")
-    parser.add_argument("repo", type=str, nargs="+", help="names of the repositories to operate on")
-    parser.add_argument("-p", "--publish", action="store_true", help="publish the available builds")
-    parser.add_argument("-o", "--output", type=Path, default=DEFAULT_OUTPUT, help="output file")
-    parser.add_argument("--swifty", type=Path, default=DEFAULT_SWIFTY_CLI,
+    parser.add_argument("repo", type=str, nargs="*", help="names of the repositories to operate on")
+    parser.add_argument("-p", "--publish", type=Path, nargs="?", const=PUBLISH_PATH, help="publish the available builds")
+    parser.add_argument("-o", "--output", type=Path, default=OUTPUT_FILE, help="output file")
+    parser.add_argument("--swifty", type=Path, default=SWIFTY_CLI,
                         help="path to swifty-cli.exe (default: <this-file>/swifty-cli.exe)")
     args = parser.parse_args()
 
+    if args.publish is not None:
+        return publish(args.publish)
+
+    if not args.repo:
+        parser.error("no repositories given")
+
     if not args.swifty.exists():
         parser.error(f"invalid swifty location '{args.swifty}'")
+
+    if not can_make_symlinks():
+        print("error: cannot create symlinks - run as admin!")
         return 1
 
     args.output.open("w", encoding="utf-8")
 
+    success = 0
     for repo in args.repo:
-        print(f"repository: {repo}")
-        if repo.endswith(".json"):
-            repo = os.path.splitext(repo)[0]
-        repojson = Path(f"{repo}.json")
-
-        if not repojson.exists():
-            parser.error(f"repository '{repo}' does not exist")
-
-        if args.publish:
-            return publish(repo)
-        else:
-            if not can_make_symlinks():
-                print("error: cannot create symlinks - run as admin!")
-                return 2
-            return build(repo, repojson, args.swifty, args.output)
+        success = build(repo, args.swifty, args.output)
+        if success != 0:
+            return success
 
     return 0
 
