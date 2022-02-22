@@ -1,10 +1,11 @@
-# Place '@tac_mods' into 'tac_core' (with 'optionals' intact).
-# This script will copy wanted optionals out, but will NOT delete them from original.
+# Place '@mod' into 'mods/<sub-folder>' (with 'optionals' intact).
+# This script will move wanted optionals out, and delete the entire source optionals folder.
 
 # STATIC VARIABLES
 # Relative path to modpack folder
-$modpack = "tac_core"
-# Mod folder with list of optionals to copy
+$modpack = "mods/core"
+
+# Mod folder with list of optionals to move
 $mods = @{} # initialize
 $mods["@tac_mods"] = @(
     "a3_acre_racks",
@@ -14,7 +15,6 @@ $mods["@tac_mods"] = @(
     "bnae_trg42_compat_ace",
     "compat_amp",
     "compat_cup_vehicles",
-    "compat_cup_weapons",
     "compat_melb",
     "cup_ace_hearing",
     "cup_units_nouniformrestrictions",
@@ -25,28 +25,42 @@ $mods["@tac_mods"] = @(
 )
 
 $mods["@theseus_services"] = @(
-	"arcadian",
-	"variants_cup",
-	"variants_melb",
-	"weapons_apex"
+    "variants_cup",
+    "variants_melb",
+    "weapons_apex"
+)
+
+$mods["@ace"] = @(
+    "nouniformrestrictions",
+    "noactionmenu",
+    "particles",
+    "realisticdispersion"
+)
+
+$mods["@zen"] = @(
+    "compat_ace"
 )
 
 foreach ($mod in $mods.keys) {
     Write-Host $mod
     foreach ($optional in $mods.$mod) {
         $optionalName = "$($mod)_$($optional)"
-        $optionalPath = "$($modpack)\$($mod)\optionals\$optionalName"
+        $optionalsPath = "$($modpack)/$($mod)/optionals"
+        $optionalPath = "$($optionalsPath)/$optionalName"
         if (Test-Path $optionalPath) {
-            if (Test-path $modpack\$optionalName) {
+            if (Test-path $modpack/$optionalName) {
                 Write-Host "- ERROR: $($optional) already exists!"
             } else {
-                Copy-Item $optionalPath -Destination $modpack -Recurse
-                Write-Host "- Copied $($optional)"
+                Move-Item $optionalPath -Destination $modpack
+                Write-Host "- Moved $($optional)"
             }
         } else {
             Write-Host "- ERROR: $($optional) not found!"
         }
     }
-}
 
-Read-Host -Prompt "Press Enter to exit"
+    if (Test-Path $optionalsPath) {
+        Remove-Item $optionalsPath -Recurse
+    }
+    Write-Host "removed $($optionalsPath)"
+}
