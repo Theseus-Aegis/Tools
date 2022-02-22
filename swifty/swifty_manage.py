@@ -14,6 +14,7 @@ MODS_FOLDER = "mods"
 BUILD_FOLDER = "build"
 PUBLISH_PATH = "../production"
 PRELOAD_MODS = ["@cba_a3", "@ace", "@tac_mods"]
+ALWAYS_COPY = ["server"]
 
 SWIFTY_CLI = Path(__file__).parent / "swifty-cli.exe"
 OUTPUT_FILE = f"{os.path.splitext(__file__)[0]}_cfg.log"
@@ -70,6 +71,9 @@ def publish(path):
     for repojson in Path(MODS_FOLDER).parent.glob("*.json"):
         if (build / os.path.splitext(repojson)[0]).exists():
             modfolders |= parse_swifty_json(repojson)
+    for folder in ALWAYS_COPY:
+        for modfolder in Path(MODS_FOLDER, folder).glob("@*"):
+            modfolders[modfolder.name] = modfolder.parent
 
     # Copy mods that changed
     print("copy mods")
@@ -79,9 +83,11 @@ def publish(path):
 
         modsrf = mod / "mod.srf"
         publish_modsrf = publish_mod / "mod.srf"
-        equal = modsrf.exists() and publish_modsrf.exists()
-        if equal:
+        if modsrf.exists() and publish_modsrf.exists():
             equal = filecmp.cmp(modsrf, publish_modsrf)
+        else:
+            dir_compare = filecmp.dircmp(mod, publish_mod)
+            equal = not dir_compare.diff_files and not dir_compare.funny_files
 
         if not equal:
             cleaned = False
