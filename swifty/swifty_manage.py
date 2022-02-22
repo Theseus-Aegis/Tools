@@ -93,17 +93,6 @@ def publish(path):
             os.makedirs(publish_mod.parent, exist_ok=True)
             shutil.copytree(mod, publish_mod)
 
-    # Clean copy built repos
-    for publish_build_repo in publish_build.iterdir():
-        print(f"remove old published build '{publish_build_repo}'")
-        shutil.rmtree(publish_build_repo)
-
-    for build_repo in build.iterdir():
-        publish_build_repo = publish_build / build_repo.name
-        print(f"publish build '{build_repo}' -> '{publish_build_repo}'")
-        # Copy with preserving symlinks - must happen after symlinked copying mods, so they get correctly referenced!
-        shutil.copytree(build_repo, publish_build_repo, symlinks=True)
-
     # Remove removed mods
     print("cleanup mods")
     modfolder_names = set([d.name for d in modfolders.values()])
@@ -115,6 +104,19 @@ def publish(path):
                 x = Path(root, d)
                 print(f"  {x}")
                 shutil.rmtree(x)
+
+    # Clean copy built repos
+    removed = []
+    for publish_build_repo in publish_build.iterdir():
+        shutil.rmtree(publish_build_repo)
+        removed.append(publish_build_repo)
+
+    print("copy build")
+    for build_repo in build.iterdir():
+        publish_build_repo = publish_build / build_repo.name
+        print(f"  '{build_repo}' -> '{publish_build_repo}' {'(clean)' if publish_build_repo in removed else '(new)'}")
+        # Copy with preserving symlinks - must happen after symlinked copying mods, so they get correctly referenced!
+        shutil.copytree(build_repo, publish_build_repo, symlinks=True)
 
     return 0
 
