@@ -64,6 +64,3 @@ foreach ($mod in $mods.keys) {
     }
     Write-Host "removed $($optionalsPath)"
 }
-
-Read-Host -Prompt "Press Enter to exit"
-
