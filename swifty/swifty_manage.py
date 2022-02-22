@@ -12,11 +12,11 @@ from pathlib import Path
 
 MODS_FOLDER = "mods"
 BUILD_FOLDER = "build"
-PUBLISH_PATH = "../production"
+PUBLISH_PATH = "../release"
 PRELOAD_MODS = ["@cba_a3", "@ace", "@tac_mods"]
 ALWAYS_COPY = ["server"]
 
-SWIFTY_CLI = Path(__file__).parent / "swifty-cli.exe"
+SWIFTY_CLI = Path(__file__).resolve().parent / "swifty-cli.exe"
 OUTPUT_FILE = f"{os.path.splitext(__file__)[0]}_cfg.log"
 
 
