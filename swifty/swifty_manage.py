@@ -81,13 +81,16 @@ def publish(path):
         mod = modpath / modname
         publish_mod = path / modpath / modname
 
-        modsrf = mod / "mod.srf"
-        publish_modsrf = publish_mod / "mod.srf"
-        if modsrf.exists() and publish_modsrf.exists():
-            equal = filecmp.cmp(modsrf, publish_modsrf)
-        else:
-            dir_compare = filecmp.dircmp(mod, publish_mod)
-            equal = not dir_compare.diff_files and not dir_compare.funny_files
+        equal = False
+        if mod.exists() and publish_mod.exists():
+            modsrf = mod / "mod.srf"
+            publish_modsrf = publish_mod / "mod.srf"
+
+            if modsrf.exists() and publish_modsrf.exists():
+                equal = filecmp.cmp(modsrf, publish_modsrf)
+            else:
+                dir_compare = filecmp.dircmp(mod, publish_mod)
+                equal = not dir_compare.diff_files and not dir_compare.funny_files
 
         if not equal:
             cleaned = False
@@ -244,6 +247,10 @@ def build(repo, swifty_cli, output):
         for modkey in modkeys.glob("*.bikey"):
             print(f"  {modkey} -> {build_keys}")
             shutil.copy2(modkey, build_keys)
+
+    for key in Path(MODS_FOLDER).glob("*.bikey"):
+        print(f"  {key} -> {build_keys} (global)")
+        shutil.copy2(key, build_keys)
 
     # Report and log config
     modline = f"{repo} modline:\n  -mod={modline}\n"
