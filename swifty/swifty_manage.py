@@ -65,24 +65,11 @@ def publish(path):
     os.makedirs(publish_build, exist_ok=True)
     os.makedirs(publish_mods, exist_ok=True)
 
-    # Make a clean copy of all built repos
     # Prepare all mod folder data
     modfolders = dict()
-    for publish_build_repo in publish_build.iterdir():
-        print(f"remove old published build '{publish_build_repo}'")
-        shutil.rmtree(publish_build_repo)
-
-    for build_repo in build.iterdir():
-        publish_build_repo = publish_build / build_repo.name
-        print(f"publish build '{build_repo}' -> '{publish_build_repo}'")
-        # Copy with preserving symlinks
-        shutil.copytree(build_repo, publish_build_repo, symlinks=True)
-
-        repojson = Path(f"{publish_build_repo.name}.json")
-        if not repojson.exists():
-            print(f"error: repository file '{repojson}' does not exist!")
-            return 1
-        modfolders |= parse_swifty_json(repojson)
+    for repojson in Path(MODS_FOLDER).parent.glob("*.json"):
+        if (build / os.path.splitext(repojson)[0]).exists():
+            modfolders |= parse_swifty_json(repojson)
 
     # Copy mods that changed
     print("copy mods")
@@ -90,11 +77,11 @@ def publish(path):
         mod = modpath / modname
         publish_mod = path / modpath / modname
 
-        mod_srf = mod / "mod.srf"
-        publish_mod_srf = publish_mod / "mod.srf"
-        equal = mod_srf.exists() and publish_mod_srf.exists()
+        modsrf = mod / "mod.srf"
+        publish_modsrf = publish_mod / "mod.srf"
+        equal = modsrf.exists() and publish_modsrf.exists()
         if equal:
-            equal = filecmp.cmp(mod_srf, publish_mod_srf)
+            equal = filecmp.cmp(modsrf, publish_modsrf)
 
         if not equal:
             cleaned = False
@@ -105,6 +92,17 @@ def publish(path):
             print(f"  {mod} -> {publish_mod} {'(clean)' if cleaned else '(new)'}")
             os.makedirs(publish_mod.parent, exist_ok=True)
             shutil.copytree(mod, publish_mod)
+
+    # Clean copy built repos
+    for publish_build_repo in publish_build.iterdir():
+        print(f"remove old published build '{publish_build_repo}'")
+        shutil.rmtree(publish_build_repo)
+
+    for build_repo in build.iterdir():
+        publish_build_repo = publish_build / build_repo.name
+        print(f"publish build '{build_repo}' -> '{publish_build_repo}'")
+        # Copy with preserving symlinks - must happen after symlinked copying mods, so they get correctly referenced!
+        shutil.copytree(build_repo, publish_build_repo, symlinks=True)
 
     # Remove removed mods
     print("cleanup mods")
@@ -117,9 +115,6 @@ def publish(path):
                 x = Path(root, d)
                 print(f"  {x}")
                 shutil.rmtree(x)
-
-    # TODO Handle server keys
-    # ???
 
     return 0
 
@@ -157,8 +152,6 @@ def build(repo, swifty_cli, output):
     if build.exists():
         print(f"remove old build '{build}'")
         shutil.rmtree(build)
-
-    print(f"prepare build '{build}'")
     os.makedirs(build)
 
     # Generate Swifty files (mod.srf and repo.json)
@@ -212,6 +205,7 @@ def build(repo, swifty_cli, output):
     if mod_errors != 0:
         return 3
 
+    # Symlink mods and apply generated checksums
     print("symlink")
     modline = ""
     for mod in mods:
@@ -229,6 +223,21 @@ def build(repo, swifty_cli, output):
             shutil.copy2(file, mod)
         shutil.rmtree(modtmp)
 
+    # Assemble keys
+    print("keys")
+    build_keys = build / "keys"
+    if build_keys.exists():
+        print(f"remove old keys '{build_keys}'")
+        shutil.rmtree(build_keys)
+    os.makedirs(build_keys)
+
+    for mod in mods:
+        modkeys = mod / "keys"
+        for modkey in modkeys.glob("*.bikey"):
+            print(f"  {modkey} -> {build_keys}")
+            shutil.copy2(modkey, build_keys)
+
+    # Report and log config
     modline = f"{repo} modline:\n  -mod={modline}\n"
     print(modline)
     output.open("a", encoding="utf-8").write(modline)
