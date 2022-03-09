@@ -54,7 +54,7 @@ if __name__ == "__main__":
         ) as connection:
             print(connection)
             cursor = connection.cursor()
-            
+
             with open(SCRIPT_PATH, "r") as fp:
                 sqlLines = fp.readlines()
 

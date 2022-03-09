@@ -8,7 +8,7 @@
 
 - Run `runImport.bat`from your desktop
 - If you get an error "ERROR: file *XYZ* could not be found, please create it."
-  - Navigate to `C:\ProgramData\MySQL\MySQL Server 8.0\Uploads` 
+  - Navigate to `C:\ProgramData\MySQL\MySQL Server 8.0\Uploads`
   - Duplicate `DO_NOT_DELETE_chronos.csv`
   - Rename new file to `chronos.csv`
   - Restart script
