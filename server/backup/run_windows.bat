@@ -1,0 +1,1 @@
+venv\Scripts\activate.bat && python backup.py %* && deactivate
