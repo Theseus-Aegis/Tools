@@ -247,6 +247,9 @@ def main():
             gfile.SetContentFile(filePath)
             gfile.Upload()
 
+            # Upload() does not close the last file reliably
+            gfile.content.close()
+
         # Remove oldest backup when there are more than BACKUPS_TO_KEEP_GDRIVE
         gfolders = drive.ListFile({
             "q": f"\"{GDRIVE_FOLDER_ID}\" in parents and trashed=False",
