@@ -231,7 +231,7 @@ def build(repo, swifty_cli, output):
         os.rename(mod, modtmp)
         os.symlink(Path("..", "..", modpath), mod)
         for file in modtmp.iterdir():
-            shutil.copy2(file, mod)
+            shutil.copyfile(file, mod / file.name)
         shutil.rmtree(modtmp)
 
     # Assemble keys
@@ -246,11 +246,11 @@ def build(repo, swifty_cli, output):
         modkeys = mod / "keys"
         for modkey in modkeys.glob("*.bikey"):
             print(f"  {modkey} -> {build_keys}")
-            shutil.copy2(modkey, build_keys)
+            shutil.copyfile(modkey, build_keys / modkey.name)
 
     for key in Path(MODS_FOLDER).glob("*.bikey"):
         print(f"  {key} -> {build_keys} (global)")
-        shutil.copy2(key, build_keys)
+        shutil.copyfile(key, build_keys / key.name)
 
     # Report and log config
     modline = f"{repo} modline:\n  -mod={modline}\n"
