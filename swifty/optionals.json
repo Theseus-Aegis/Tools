@@ -1,0 +1,66 @@
+{
+    "paths": {
+        "base": "/opt/theseus/arma3/modpack/development/mods/base/",
+        "core": "/opt/theseus/arma3/modpack/development/mods/core/"
+    },
+    "mods": [
+        {
+            "name": "@ace",
+            "layer": "base",
+            "optionals": {
+                "base": [],
+                "core": [
+                    "nouniformrestrictions",
+                    "noactionmenu",
+                    "particles",
+                    "realisticdispersion"
+                ]
+            }
+        },
+        {
+            "name": "@zen",
+            "layer": "core",
+            "optionals": {
+                "base": [],
+                "core": [
+                    "compat_ace"
+                ]
+            }
+        },
+        {
+            "name": "@theseus_services",
+            "layer": "core",
+            "optionals": {
+                "base": [],
+                "core": [
+                    "variants_cup",
+                    "variants_melb",
+                    "weapons_apex"
+                ]
+            }
+        },
+        {
+            "name": "@tac_mods",
+            "layer": "core",
+            "optionals": {
+                "base": [],
+                "core": [
+                    "a3_acre_racks",
+                    "bnae_falkor_compat_ace",
+                    "bnae_mk1_compat_ace",
+                    "bnae_rk95_compat_ace",
+                    "bnae_trg42_compat_ace",
+                    "compat_amp",
+                    "compat_cup_vehicles",
+                    "compat_melb",
+                    "cup_ace_hearing",
+                    "cup_units_nouniformrestrictions",
+                    "cup_vehicles_acre_racks",
+                    "melb_ace_fastroping",
+                    "melb_tweaks",
+                    "milgp_ace_hearing"
+                ]
+            }
+        }
+    ]
+}
