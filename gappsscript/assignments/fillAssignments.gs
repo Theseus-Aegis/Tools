@@ -16,6 +16,10 @@ function fillAssignments() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var content = requestNextContract();
 
+  if (!["Contract", "Sub-Contract"].includes(content.type)) {
+    return;
+  }
+
   // Set mission name if different
   if (sheet.getRange('F33').getValue() != content.title) {
     sheet.getRange('F33').setValue(content.title);
