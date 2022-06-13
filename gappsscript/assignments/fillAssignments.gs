@@ -16,20 +16,37 @@ function fillAssignments() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var content = requestNextContract();
 
+  // Set mission name if different
   if (sheet.getRange('F33').getValue() != content.title) {
     sheet.getRange('F33').setValue(content.title);
   }
 
+  // Populate Contractors list
   for (var i in content.comments) {
-    var row = parseInt(i) + 2;
+    var comment = contents.comments[i];
 
-    if (sheet.getRange('B' + row).getValue() != content.comments[i].author) {
-      sheet.getRange('B' + row).setValue(content.comments[i].author);
-      sheet.getRange('C' + row).setValue(content.comments[i].subject);
+    var row = parseInt(i) + 2;
+    var nameRange = sheet.getRange('B' + row);
+    var roleRange = sheet.getRange('C' + row);
+    var noteRange = sheet.getRange('D' + row);
+
+    // Author and roles if different
+    if (nameRange.getValue() != comment.author) {
+      nameRange.setValue(comment.author);
+    }
+    if (roleRange.getValue() != comment.subject) {
+      roleRange.setValue(comment.subject);
     }
 
-    Logger.log(i + " " + content.comments[i].author + " " + row);
+    // Append/Remove "[Recruit]" to note (comment)
+    var note = noteRange.getValue();
+    if (comment.isRecruit === true && !note.includes("[Recruit]")) {
+      noteRange.setValue("[Recruit] " + note);
+    } else if (note.includes("[Recruit]")) {
+      noteRange.setValue(note.substring(9));
+    }
   }
 
+  // Clear the rest of the Contractors list
   sheet.getRange('B' + (row + 1) + ':C33').clear({contentsOnly: true, skipFilteredRows: true});
 }
