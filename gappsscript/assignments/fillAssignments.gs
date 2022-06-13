@@ -23,7 +23,7 @@ function fillAssignments() {
 
   // Populate Contractors list
   for (var i in content.comments) {
-    var comment = contents.comments[i];
+    var comment = content.comments[i];
 
     var row = parseInt(i) + 2;
     var nameRange = sheet.getRange('B' + row);
