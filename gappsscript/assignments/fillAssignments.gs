@@ -25,9 +25,12 @@ function fillAssignments() {
     sheet.getRange('F33').setValue(content.title);
   }
 
+  // Filter attendees
+  var comments = content.comments.filter(i => i.attendance == 'yes');
+
   // Populate Contractors list
-  for (var i in content.comments) {
-    var comment = content.comments[i];
+  for (var i in comments) {
+    var comment = comments[i];
 
     var row = parseInt(i) + 2;
     var nameRange = sheet.getRange('B' + row);
