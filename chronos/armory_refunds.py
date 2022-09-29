@@ -15,6 +15,8 @@ from mysql.connector import connect
 # Refunds specified items in Chronos-Apollo         #
 #                                                   #
 # Requires mysql-connector-python package installed #
+# and a user with following table privileges        #
+#   [Delete, Insert, Select, Update]                #
 #####################################################
 
 # ####### GLOBALS ######## #
