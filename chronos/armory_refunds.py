@@ -7,6 +7,7 @@ import os
 import csv
 from collections import defaultdict
 from dataclasses import dataclass, field, fields, astuple
+from datetime import datetime, timezone
 
 from mysql.connector import connect
 
@@ -389,8 +390,9 @@ def main():
                     cursor.execute(query)
 
                 refund_note = ", ".join(refund.note)
-                query = f"INSERT INTO {TABLE_TRANSACTIONS} (transactionInitiator, transactionReceiver, type, description, cost, balance, category)\n"
-                query += f"  VALUES (0, {refund.uid}, 'Money Transfer', '{REFUND_PREFIX} {refund_note}', {refund.total}, {refund.balance}, 'Transfer');"
+                date = datetime.now(timezone.utc)
+                query = f"INSERT INTO {TABLE_TRANSACTIONS} (transactionInitiator, transactionReceiver, type, description, date, cost, balance, category)\n"
+                query += f"  VALUES ({refund.uid}, 0, 'Money Transfer', '{REFUND_PREFIX} {refund_note}', '{date}', {refund.total}, {refund.balance}, 'Transfer');"
 
                 print(query)
                 if args.execute:
