@@ -13,7 +13,7 @@ function requestNextContract() {
 }
 
 function fillAssignments() {
-  var sheet = SpreadsheetApp.getActiveSheet();
+  var sheet = SpreadsheetApp.getActive().getSheetByName("Team Assignments");
   var content = requestNextContract();
 
   if (!["Contract", "Sub-Contract"].includes(content.type)) {
@@ -21,8 +21,12 @@ function fillAssignments() {
   }
 
   // Set mission name if different
-  if (sheet.getRange('F33').getValue() != content.title) {
-    sheet.getRange('F33').setValue(content.title);
+  if (sheet.getRange('F30').getValue() != content.title) {
+    sheet.getRange('F30').setRichTextValue(
+      SpreadsheetApp.newRichTextValue()
+        .setText(content.title)
+        .setLinkUrl("https://www.theseus-aegis.com/node/" + content.id)
+        .build())
   }
 
   // Filter attendees
@@ -30,7 +34,7 @@ function fillAssignments() {
 
   // Populate Contractors list
   for (var i in comments) {
-    var comment = comments[i];
+    var comment = comments[parseInt(i)];
 
     var row = parseInt(i) + 2;
     var nameRange = sheet.getRange('B' + row);

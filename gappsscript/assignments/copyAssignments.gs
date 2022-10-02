@@ -2,31 +2,48 @@
  * @OnlyCurrentDoc
  */
 
-function teamToText(spreadsheet, nameCell, valuesRange) {
-  var items = spreadsheet.getRange(valuesRange).getValues();
+function teamToText(sheet, nameCell, valuesRange) {
+  var items = sheet.getRange(valuesRange).getValues();
   var text = items.filter(i => i[0] != '').map(i => i[0] + ' - ' + i[1] + '\n').join('');
   if (text != '') {
-    return '\n*' + spreadsheet.getRange(nameCell).getValue() + '*\n' + text;
+    return '\n**' + sheet.getRange(nameCell).getValue() + '**\n' + text;
   } else {
     return '';
   }
 }
 
 function copyAssignments() {
-  var spreadsheet = SpreadsheetApp.getActive();
-  var target = spreadsheet.getRange('I33');
+  var sheet = SpreadsheetApp.getActive().getSheetByName("Team Assignments");
 
-  var msg = 'Team Assignments for ';
-  msg += '*"' + spreadsheet.getRange('F33').getValue() + '"*\n';
+  var contract = sheet.getRange('F30').getValue();
+  var contractUrl = sheet.getRange('F30').getRichTextValue().getLinkUrl();
+  var leftSlots = sheet.getRange('F31').getValue();
+  var recommendedAmmo = sheet.getRange('F32').getValue();
+  var additionalInfo = sheet.getRange('F33').getValue();
 
-  msg += teamToText(spreadsheet, 'F1', 'F2:G11');
-  msg += teamToText(spreadsheet, 'F13', 'F14:G23');
-  msg += teamToText(spreadsheet, 'I1', 'I2:J11');
-  msg += teamToText(spreadsheet, 'F25', 'F26:G30');
-  msg += teamToText(spreadsheet, 'I13', 'I14:J23');
-  msg += teamToText(spreadsheet, 'I25', 'I26:J30');
+  var msg = teamToText(sheet, 'E1', 'E2:F11');
+  msg += teamToText(sheet, 'E13', 'E14:F23');
+  msg += teamToText(sheet, 'G1', 'G2:H11');
+  msg += teamToText(sheet, 'E25', 'E26:F28');
+  msg += teamToText(sheet, 'G13', 'G14:H23');
+  msg += teamToText(sheet, 'G25', 'G26:H30');
 
-  msg += '\n_Additional contractors slot into Ares 3._'
+  if (contract == "" || msg == "" || leftSlots == "") {
+    showWarning("No Contract selected, no contractors have assigned roles or no team selected for additional contractors!");
+    return; // Fail-safe if empty
+  }
 
-  target.setValue(msg);
+  msg += "\n_Additional contractors slot into **" + leftSlots + "**._";
+
+  if (recommendedAmmo != "") {
+    msg += "\n\n> **Recommended Ammo:** " + recommendedAmmo;
+  }
+  if (additionalInfo != "") {
+    msg += "\n> \n" + additionalInfo.toString().replace(/^/gm, "> ");
+  }
+
+  // Send to chat
+  if (showAlert("Are you sure you want to post Team Assignments to Discord?")) {
+    postAssignments(contract, contractUrl, msg);
+  }
 }
