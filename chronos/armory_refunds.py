@@ -309,7 +309,7 @@ def main():
                 else:
                     refunds[uid].items.append(Item(classname, "", 0))
                     print(f"warning: '{classname}' owned by {uid} not found in old item list - it will be removed without refund")
-                    #input("  confirm?")
+                    input("  confirm? (ctrl+c to cancel)")
 
         # loadout
         cursor.execute(f"SELECT playerID, loadout FROM {TABLE_EQUIPPED}")
@@ -328,7 +328,7 @@ def main():
                             print(f"warning: unable to remove '{old_item.classname}' from {uid} ({playerid}) - item will be refunded, but not removed!")
                             found_index = loadout_orig.find(old_item.classname)
                             print(f"    {loadout_orig[max(0, found_index - 15):found_index + len(old_item.classname) + 100]}")
-                            input("  confirm?")
+                            input("  confirm? (ctrl+c to cancel)")
                             loadout_unremovable[old_item.classname].append(playerid)
 
                         refunds[uid].total += quantity * old_item.price
