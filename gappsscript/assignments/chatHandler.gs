@@ -1,9 +1,8 @@
 /**
  * @OnlyCurrentDoc
+ *
+ * WEBHOOK_URL_* variables should be saved in Git-ignored secrets.gs file.
  */
-
-var WEBHOOK_URL_TEAM_LEADS = "https://discord.com/api/webhooks/1026190001823821984/rVP2lgAlyCf8ZQzO-Txe8cSv0omsiAk43HkDLIv4t0Oc4Sag-cQuIfqc3EQikYZPCyQz"
-var WEBHOOK_URL_ASSIGNMENTS = "https://discord.com/api/webhooks/1026199668394307733/s4po_HbKJ8myFg06XGCJhjnyxERS5XmBy146RDpCTjjbSWa8uu1NdC_pXFE1plqL-0Dt";
 
 function sendWebhookMessage(webhookUrl, message) {
     var options = {
@@ -58,5 +57,5 @@ function postAssignments(title, url, msg) {
       "description": msg
     }]
   };
-  sendWebhookMessage(WEBHOOK_URL_TEAM_LEADS, message);
+  sendWebhookMessage(WEBHOOK_URL_ASSIGNMENTS, message);
 }
