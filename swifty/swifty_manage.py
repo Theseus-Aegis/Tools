@@ -255,6 +255,9 @@ def build(repo, swifty_cli, output):
             shutil.copyfile(file, mod / file.name)
         shutil.rmtree(modtmp)
 
+    for cdlc in cdlcs:
+        modline = f"{cdlc};{modline}"
+
     # Assemble keys
     print("keys")
     key_errors = 0
