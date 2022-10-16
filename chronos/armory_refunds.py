@@ -276,7 +276,10 @@ def main():
         next(csvread, None)  # Header
         for row in csvread:
             if row[0]:
-                old_item_list[row[0].lower()] = Item(row[0].lower(), row[1], int(row[5]))  # classname, name, price
+                # Spreadsheet export (no IDs)
+                # old_item_list[row[0].lower()] = Item(row[0].lower(), row[1], int(row[5]))  # classname, name, price
+                # Database export (with IDs)
+                old_item_list[row[1].lower()] = Item(row[1].lower(), row[2], int(row[6]))  # classname, name, price
 
     # get playerid to uid mapping
     with connect(host=args.databasehost, database=DB_USERS, user=args.databaseuser, password=args.databasepassword) as conn:
