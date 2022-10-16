@@ -51,6 +51,12 @@ def parse_swifty_json(repojson):
                 for modfolder in modpath.parent.iterdir():
                     print(f"    {modfolder.name} -> {modpath.parent}")
                     modfolders[modfolder.name] = modpath.parent
+            elif modpath.name.startswith("@") and modpath.name.endswith("*"):
+                for modfolder in modpath.parent.iterdir():
+                    if modfolder.name.startswith(modpath.name[:-1]):
+                        print(f"    {modfolder.name} -> {modpath.parent}")
+                        modfolders[modfolder.name] = modpath.parent
+
             else:
                 modfolders[modpath.name] = modpath.parent
 
