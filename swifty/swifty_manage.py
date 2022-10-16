@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 
 MODS_FOLDER = "mods"
+KEYS_GLOBAL_FOLDER = MODS_FOLDER
+KEYS_CDLC_FOLDER = "mods/keys"
 BUILD_FOLDER = "build"
 PUBLISH_PATH = "../release"
 PRELOAD_MODS = ["@cba_a3", "@ace", "@tac_mods"]
@@ -36,8 +38,12 @@ def can_make_symlinks():
 def parse_swifty_json(repojson):
     print(f"parse '{repojson}'")
     modfolders = dict()
+    cdlcs = []
+
     with open(repojson, "r", encoding="utf-8") as repodata:
         data = json.load(repodata)
+
+        # Mods
         mods = data["requiredMods"] + data["optionalMods"]
         for mod in mods:
             enabled = mod.get("enabled", True) and mod.get("Enabled", True)
@@ -56,11 +62,20 @@ def parse_swifty_json(repojson):
                     if modfolder.name.startswith(modpath.name[:-1]):
                         print(f"    {modfolder.name} -> {modpath.parent}")
                         modfolders[modfolder.name] = modpath.parent
-
             else:
                 modfolders[modpath.name] = modpath.parent
 
-    return modfolders
+        # Creator DLCs
+        client_params = data["clientParameters"].split()
+        for param in client_params:
+            if param.startswith("-mod="):
+                param_split = param.split("=")
+                if len(param_split) > 1:
+                    for cdlc in param_split[1].split(";"):
+                        if cdlc != "":
+                            cdlcs.append(cdlc)
+
+    return modfolders, cdlcs
 
 
 def publish(path):
@@ -76,7 +91,7 @@ def publish(path):
     modfolders = dict()
     for repojson in Path(MODS_FOLDER).parent.glob("*.json"):
         if (build / os.path.splitext(repojson)[0]).exists():
-            modfolders |= parse_swifty_json(repojson)
+            modfolders |= parse_swifty_json(repojson)[0]
     for folder in ALWAYS_COPY:
         for modfolder in Path(MODS_FOLDER, folder).glob("@*"):
             modfolders[modfolder.name] = modfolder.parent
@@ -163,7 +178,7 @@ def build(repo, swifty_cli, output):
                 _to_lower(Path(root, f), Path(root, f.lower()))
 
     build = Path(BUILD_FOLDER, repo)
-    modfolders = parse_swifty_json(repojson)
+    modfolders, cdlcs = parse_swifty_json(repojson)
 
     # Prepare build folder
     if build.exists():
@@ -242,6 +257,8 @@ def build(repo, swifty_cli, output):
 
     # Assemble keys
     print("keys")
+    key_errors = 0
+
     build_keys = build / "keys"
     if build_keys.exists():
         print(f"remove old keys '{build_keys}'")
@@ -254,9 +271,21 @@ def build(repo, swifty_cli, output):
             print(f"  {modkey} -> {build_keys}")
             shutil.copyfile(modkey, build_keys / modkey.name)
 
-    for key in Path(MODS_FOLDER).glob("*.bikey"):
+    for cdlc in cdlcs:
+        key = Path(KEYS_CDLC_FOLDER) / f"{cdlc}.bikey"
+        if key.exists():
+            print(f"  {key} -> {build_keys} (creator dlc)")
+            shutil.copyfile(key, build_keys / key.name)
+        else:
+            print(f"error: key '{key}' not found!")
+            key_errors += 1
+
+    for key in Path(KEYS_GLOBAL_FOLDER).glob("*.bikey"):
         print(f"  {key} -> {build_keys} (global)")
         shutil.copyfile(key, build_keys / key.name)
+
+    if key_errors != 0:
+        return 4
 
     # Report and log config
     modline = f"{repo} modline:\n  -mod={modline}\n"
