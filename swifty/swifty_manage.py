@@ -12,7 +12,7 @@ from pathlib import Path
 
 MODS_FOLDER = "mods"
 KEYS_GLOBAL_FOLDER = MODS_FOLDER
-KEYS_CDLC_FOLDER = "mods/keys"
+KEYS_DLC_FOLDER = "mods/keys"
 BUILD_FOLDER = "build"
 PUBLISH_PATH = "../release"
 PRELOAD_MODS = ["@cba_a3", "@ace", "@tac_mods"]
@@ -38,7 +38,7 @@ def can_make_symlinks():
 def parse_swifty_json(repojson):
     print(f"parse '{repojson}'")
     modfolders = dict()
-    cdlcs = []
+    dlcs = []
 
     with open(repojson, "r", encoding="utf-8") as repodata:
         data = json.load(repodata)
@@ -65,17 +65,13 @@ def parse_swifty_json(repojson):
             else:
                 modfolders[modpath.name] = modpath.parent
 
-        # Creator DLCs
-        client_params = data["clientParameters"].split()
-        for param in client_params:
-            if param.startswith("-mod="):
-                param_split = param.split("=")
-                if len(param_split) > 1:
-                    for cdlc in param_split[1].split(";"):
-                        if cdlc != "":
-                            cdlcs.append(cdlc)
+        # DLCs
+        for dlc in data["requiredDLCS"]:
+            if dlc != "":
+                print(f"  {dlc} (dlc)")
+                dlcs.append(dlc)
 
-    return modfolders, cdlcs
+    return modfolders, dlcs
 
 
 def publish(path):
@@ -178,7 +174,7 @@ def build(repo, swifty_cli, output):
                 _to_lower(Path(root, f), Path(root, f.lower()))
 
     build = Path(BUILD_FOLDER, repo)
-    modfolders, cdlcs = parse_swifty_json(repojson)
+    modfolders, dlcs = parse_swifty_json(repojson)
 
     # Prepare build folder
     if build.exists():
@@ -255,8 +251,8 @@ def build(repo, swifty_cli, output):
             shutil.copyfile(file, mod / file.name)
         shutil.rmtree(modtmp)
 
-    for cdlc in cdlcs:
-        modline = f"{cdlc};{modline}"
+    for dlc in dlcs:
+        modline = f"{dlc};{modline}"
 
     # Assemble keys
     print("keys")
@@ -274,10 +270,10 @@ def build(repo, swifty_cli, output):
             print(f"  {modkey} -> {build_keys}")
             shutil.copyfile(modkey, build_keys / modkey.name)
 
-    for cdlc in cdlcs:
-        key = Path(KEYS_CDLC_FOLDER) / f"{cdlc}.bikey"
+    for dlc in dlcs:
+        key = Path(KEYS_DLC_FOLDER) / f"{dlc}.bikey"
         if key.exists():
-            print(f"  {key} -> {build_keys} (creator dlc)")
+            print(f"  {key} -> {build_keys} (dlc)")
             shutil.copyfile(key, build_keys / key.name)
         else:
             print(f"error: key '{key}' not found!")
