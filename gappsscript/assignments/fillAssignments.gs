@@ -16,9 +16,9 @@ function fillAssignments() {
   var sheet = SpreadsheetApp.getActive().getSheetByName("Team Assignments");
   var content = requestNextContract();
 
-  if (!["Contract", "Sub-Contract"].includes(content.type)) {
+  /*if (!["Contract", "Sub-Contract"].includes(content.type)) {
     return;
-  }
+  }*/
 
   // Set mission name if different
   if (sheet.getRange('F30').getValue() != content.title) {
@@ -30,7 +30,7 @@ function fillAssignments() {
   }
 
   // Filter attendees
-  var comments = content.comments.filter(i => i.attendance == 'yes');
+  var comments = content.comments.filter(i => i.attendance != 'no');
 
   // Populate Contractors list
   for (var i in comments) {
@@ -49,12 +49,20 @@ function fillAssignments() {
       roleRange.setValue(comment.subject);
     }
 
-    // Append/Remove "[Recruit]" to note (comment)
     var note = noteRange.getValue();
-    if (comment.isRecruit === true && !note.includes("[Recruit]")) {
+
+    // Append/Remove "[Recruit]" to note (comment)
+    if (comment.isRecruit === true && !note.includes("[Recruit] ")) {
       noteRange.setValue("[Recruit] " + note);
-    } else if (note.includes("[Recruit]")) {
-      noteRange.setValue(note.substring(9));
+    } else if (comment.isRecruit === false && note.includes("[Recruit] ")) {
+      noteRange.setValue(note.replace("[Recruit] ", ""));
+    }
+
+    // Append/Remove "[Maybe]" to note (comment)
+    if (comment.attendance == "may" && !note.includes("[Maybe] ")) {
+      noteRange.setValue("[Maybe] " + note)
+    } else if (comment.attendance != "may" && note.includes("[Maybe] ")) {
+      noteRange.setValue(note.replace("[Maybe] ", ""));
     }
   }
 
