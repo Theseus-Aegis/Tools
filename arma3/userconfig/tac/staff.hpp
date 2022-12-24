@@ -8,6 +8,7 @@
     "76561198324654204", /* gilleedoo */ \
     "76561197985332763"  /* rg */
 
+// Enable Debug Console and similar tools for given admins
 #define DEBUG_ADMINS \
     "76561198048995566", /* Jonpas */ \
     "76561198085500182", /* Mike */   \
