@@ -8,6 +8,9 @@ function requestNextContract() {
   if (response.getResponseCode() == 200) {
     Logger.log(response.getContentText());
     return JSON.parse(response.getContentText());
+  } else if (response.getResponseCode() == 404) {
+    Logger.log("404 - No Contract scheduled");
+    return null;
   }
   throw new Error('Querying contract failed!');
 }
@@ -15,6 +18,9 @@ function requestNextContract() {
 function fillAssignments() {
   var sheet = SpreadsheetApp.getActive().getSheetByName("Team Assignments");
   var content = requestNextContract();
+  if (content == null) {
+    return;
+  }
 
   /*if (!["Contract", "Sub-Contract"].includes(content.type)) {
     return;
