@@ -107,7 +107,9 @@ def publish(path):
                 equal = filecmp.cmp(modsrf, publish_modsrf)
             else:
                 dir_compare = filecmp.dircmp(mod, publish_mod)
-                equal = not dir_compare.diff_files and not dir_compare.funny_files
+                diff_files = dir_compare.diff_files or dir_compare.funny_files
+                missing_or_excessive = dir_compare.left_only or dir_compare.right_only
+                equal = not diff_files and not missing_or_excessive
 
         if not equal:
             cleaned = False
