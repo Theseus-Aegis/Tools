@@ -58,9 +58,9 @@ function fillAssignments() {
     var note = noteRange.getValue();
 
     // Append/Remove "[Recruit]" to note (comment)
-    if (comment.isRecruit === true && !note.includes("[Recruit] ")) {
+    if (comment.isRecruit == "true" && !note.includes("[Recruit] ")) {
       noteRange.setValue("[Recruit] " + note);
-    } else if (comment.isRecruit === false && note.includes("[Recruit] ")) {
+    } else if (comment.isRecruit == "false" && note.includes("[Recruit] ")) {
       noteRange.setValue(note.replace("[Recruit] ", ""));
     }
 
