@@ -17,7 +17,7 @@ function sendWebhookMessage(webhookUrl, message) {
 
 function postNextActuals() {
   var sheet = SpreadsheetApp.getActive().getSheetByName("Actual Rotation");
-  var actuals = sheet.getRange("R10:R14").getValues();
+  var actuals = sheet.getRange("A2:A6").getValues();
 
   var msg = "\n- **" + actuals[0] + "**";
   msg += "\n- " + actuals[1];
