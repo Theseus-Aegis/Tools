@@ -73,5 +73,5 @@ function fillAssignments() {
   }
 
   // Clear the rest of the Contractors list
-  sheet.getRange('B' + (row + 1) + ':C33').clear({contentsOnly: true, skipFilteredRows: true});
+  sheet.getRange('B' + (row + 1) + ':D33').clear({contentsOnly: true, skipFilteredRows: true});
 }
