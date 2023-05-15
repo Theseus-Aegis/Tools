@@ -277,9 +277,9 @@ def main():
         for row in csvread:
             if row[0]:
                 # Spreadsheet export (no IDs)
-                # old_item_list[row[0].lower()] = Item(row[0].lower(), row[1], int(row[5]))  # classname, name, price
+                old_item_list[row[0].lower()] = Item(row[0].lower(), row[1], int(row[5]))  # classname, name, price
                 # Database export (with IDs)
-                old_item_list[row[1].lower()] = Item(row[1].lower(), row[2], int(row[6]))  # classname, name, price
+                # old_item_list[row[1].lower()] = Item(row[1].lower(), row[2], int(row[6]))  # classname, name, price
 
     # get playerid to uid mapping
     with connect(host=args.databasehost, database=DB_USERS, user=args.databaseuser, password=args.databasepassword) as conn:
@@ -317,6 +317,11 @@ def main():
         # loadout
         cursor.execute(f"SELECT playerID, loadout FROM {TABLE_EQUIPPED}")
         for (playerid, loadout_orig) in cursor:
+            if playerid not in players:
+                print(f"warning: {playerid} mapping not found (removed user?) - item will not be removed!")
+                input("  confirm? (ctrl+c to cancel)")
+                continue
+
             uid = players[playerid]
             refunds[uid].uid = uid
 
@@ -341,7 +346,6 @@ def main():
             if loadout != loadout_orig:
                 print(f"\n{loadout_orig}\nto\n{loadout}\n")
                 refunds[uid].loadout = loadout
-
 
         # process new balances
         cursor.execute(f"SELECT id, balance FROM {TABLE_BANKACCOUNTS}")
