@@ -34,6 +34,24 @@ def can_make_symlinks():
         return False
 
 
+def get_swifty_json(repo):
+    if repo.endswith(".json"):
+        repo = os.path.splitext(repo)[0]
+    return Path(f"{repo}.json")
+
+
+# Check existence of JSON configuration files
+def check_swifty_json(repo):
+    repojson = get_swifty_json(repo)
+
+    if not repojson.exists():
+        print(f"error: repository file '{repojson}' does not exist!")
+        return ""
+
+    print(f"checked repository: {repo}")
+    return repo
+
+
 # Parse JSON for mod folders in use
 def parse_swifty_json(repojson):
     print(f"parse '{repojson}'")
@@ -150,15 +168,7 @@ def publish(path):
 
 
 def build(repo, swifty_cli, output):
-    if repo.endswith(".json"):
-        repo = os.path.splitext(repo)[0]
-    repojson = Path(f"{repo}.json")
-
     print(f"repository: {repo}")
-
-    if not repojson.exists():
-        print(f"error: repository file '{repojson}' does not exist!")
-        return 1
 
     # Lower-case all mod folders, their 'addons' and PBO files
     print("lower-case")
@@ -176,6 +186,7 @@ def build(repo, swifty_cli, output):
                 _to_lower(Path(root, f), Path(root, f.lower()))
 
     build = Path(BUILD_FOLDER, repo)
+    repojson = get_swifty_json(repo)
     modfolders, dlcs = parse_swifty_json(repojson)
 
     # Prepare build folder
@@ -315,6 +326,11 @@ def main():
 
     if not args.repo:
         parser.error("no repositories given")
+
+    for repo in args.repo:
+        if not check_swifty_json(repo):
+            parser.error(f"invalid repository '{repo}' - no '{get_swifty_json(repo)}' found")
+            return 1
 
     if not args.swifty.exists():
         parser.error(f"invalid swifty location '{args.swifty}'")
