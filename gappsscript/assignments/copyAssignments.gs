@@ -43,7 +43,5 @@ function copyAssignments() {
   }
 
   // Send to chat
-  if (showAlert("Are you sure you want to post Team Assignments to Discord?")) {
-    postAssignments(contract, contractUrl, msg);
-  }
+  postAssignments(contract, contractUrl, msg);
 }

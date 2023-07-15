@@ -1,11 +1,5 @@
-function showAlert(text = "Are you sure you want to continue?") {
-  var ui = SpreadsheetApp.getUi();
-  var result = ui.alert("Please confirm", text, ui.ButtonSet.YES_NO);
-  return result == ui.Button.YES;
-}
-
 function showWarning(text = "Something went wrong.") {
-  var ui = SpreadsheetApp.getUi();
-  var result = ui.alert("Warning", text, ui.ButtonSet.OK);
-  return result == ui.Button.YES;
+  var output = SpreadsheetApp.getActive().getSheetByName("Team Assignments").getRange('G34');
+  output.setValue("Warning! (see note)");
+  output.setNote(text);
 }
