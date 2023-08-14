@@ -5,6 +5,7 @@ import ctypes
 import filecmp
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -20,7 +21,8 @@ PRELOAD_MODS = ["@cba_a3", "@ace", "@tac_mods"]
 ALWAYS_COPY = ["server"]
 
 SWIFTY_CLI = Path(__file__).resolve().parent / "swifty-cli.exe"
-OUTPUT_FILE = f"{os.path.splitext(__file__)[0]}_cfg.log"
+INT_FILE = Path(f"{os.path.splitext(__file__)[0]}.intermediate")
+# OUTPUT_FILE = f"{os.path.splitext(__file__)[0]}.log" # TODO Change to logger with stdout and file output
 
 
 def can_make_symlinks():
@@ -61,6 +63,12 @@ def check_swifty_json(repo):
 
     print(f"checked repository: {repo}")
     return 0
+
+
+def get_swifty_json_field(repojson, field):
+    with open(repojson, "r", encoding="utf-8") as repodata:
+        data = json.load(repodata)
+        return data.get(field, None)
 
 
 # Parse JSON for mod folders in use
@@ -175,10 +183,36 @@ def publish(path):
         # Copy with preserving symlinks - must happen after symlinked copying mods, so they get correctly referenced!
         shutil.copytree(build_repo, publish_build_repo, symlinks=True)
 
+    # Update params.cfg
+    print("update params")
+    if not INT_FILE.exists():
+        print(f"error: intermediate file '{INT_FILE}' not found - rebuild required!")
+        return 1
+
+    for line in INT_FILE.open("r", encoding="utf-8").readlines():
+        repo, modline = line.split()
+        repojson = get_swifty_json(repo)
+
+        if not repojson.exists():
+            print(f"error: '{repojson}' not found - intermediate file likely tampered with!")
+            continue
+
+        paramspath = Path(get_swifty_json_field(repojson, "tac_paramsPath"))
+        if not paramspath.exists():
+            print(f"warning: '{paramspath}' not found - skipping update!")
+            continue
+
+        with open(paramspath, "r+", encoding="utf-8") as params:
+            data = params.read()
+            params.seek(0)
+            data = re.sub(r"-mod=.*", modline, data)
+            params.write(data)
+            params.truncate()
+
     return 0
 
 
-def build(repo, swifty_cli, output):
+def build(repo, swifty_cli):
     print(f"repository: {repo}")
 
     # Lower-case all mod folders, their 'addons' and PBO files
@@ -310,10 +344,9 @@ def build(repo, swifty_cli, output):
     if key_errors != 0:
         return 4
 
-    # Report and log config
-    modline = f"{repo} modline:\n  -mod={modline}\n"
-    print(modline)
-    output.open("a", encoding="utf-8").write(modline)
+    # Report and save modline
+    print(f"{repo}:\n  -mod={modline}\n")
+    INT_FILE.open("a", encoding="utf-8").write(f"{repo} -mod={modline}\n")
 
     return 0
 
@@ -345,7 +378,6 @@ def main():
     parser = argparse.ArgumentParser(description="Swifty Modpack Manager")
     parser.add_argument("repo", type=str, nargs="*", help="names of the repositories to operate on")
     parser.add_argument("-p", "--publish", type=Path, nargs="?", const=PUBLISH_PATH, help="publish the available builds")
-    parser.add_argument("-o", "--output", type=Path, default=OUTPUT_FILE, help="output file")
     parser.add_argument("--only-optional", action="store_true", help="only move optionals")
     parser.add_argument("--swifty", type=Path, default=SWIFTY_CLI,
                         help="path to swifty-cli.exe (default: <this-file>/swifty-cli.exe)")
@@ -366,11 +398,11 @@ def main():
                 print(f"error: invalid repository '{repo}'")
                 return 1
 
-        args.output.open("w", encoding="utf-8")
+        INT_FILE.open("w", encoding="utf-8")
 
         success = 0
         for repo in args.repo:
-            success = build(repo, args.swifty, args.output)
+            success = build(repo, args.swifty)
             if success != 0:
                 return success
     elif args.only_optional:

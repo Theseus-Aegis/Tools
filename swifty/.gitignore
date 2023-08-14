@@ -3,3 +3,4 @@ production
 *.exe
 *.log
 *.json
+*.intermediate
