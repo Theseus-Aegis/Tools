@@ -1,0 +1,14 @@
+{
+  "repoName": "Theseus Core",
+  "basePath": "mods",
+  "requiredDLCS": ["ws"],
+  "requiredMods": [
+    {"modName": "base/@*"},
+    {"modName": "core/@tac_mods"},
+    {"modName": "optional/@ace_particles"}
+  ],
+  "optionalMods": [],
+  "clientParameters": "-nosplash -skipIntro",
+  "servers": [],
+  "tac_paramsPath": "mods/params.cfg"
+}

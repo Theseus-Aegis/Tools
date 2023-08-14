@@ -1,6 +1,8 @@
 mods
 production
+build
 *.exe
 *.log
 *.json
 *.intermediate
+*.srf
