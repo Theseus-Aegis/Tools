@@ -207,6 +207,19 @@ def build(repo, swifty_cli, output):
             print(f"  remove '{optionals_dir}'")
             shutil.rmtree(optionals_dir)
 
+    # Check all mods exist
+    print("check mod list")
+    mod_errors = 0
+    for modfolder, modpath in modfolders.items():
+        if not (modpath / modfolder).exists():
+            print(f"error: mod folder '{modpath / modfolder}' not found!")
+            mod_errors += 1
+
+    if mod_errors != 0:
+        return 1
+
+    return 0
+
     # Prepare build folder
     if build.exists():
         print(f"remove old build '{build}'")
@@ -244,12 +257,12 @@ def build(repo, swifty_cli, output):
         return 2
 
     # Check the list of mods and prioritize preload mods
-    print("check mod list")
+    print("check build list")
     mods = [""] * len(PRELOAD_MODS)
     mod_errors = 0
     for mod in build.glob("@*"):
         if mod.name not in modfolders:
-            print(f"error: mod folder for '{mod.name}' not found!")
+            print(f"error: mod folder for '{mod.name}' not in mod list!")
             mod_errors += 1
 
         if mod.name in PRELOAD_MODS:
