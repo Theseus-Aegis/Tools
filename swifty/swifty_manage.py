@@ -41,16 +41,26 @@ def get_swifty_json(repo):
     return Path(f"{repo}.json")
 
 
-# Check existence of JSON configuration files
+# Check existence of JSON configuration files and presence of the mods
 def check_swifty_json(repo):
     repojson = get_swifty_json(repo)
 
     if not repojson.exists():
         print(f"error: repository file '{repojson}' does not exist!")
-        return ""
+        return 1
+
+    print("check mod list")
+    mod_errors = 0
+    for modfolder, modpath in parse_swifty_json(repojson)[0].items():
+        if not (modpath / modfolder).exists():
+            print(f"error: mod folder '{modpath / modfolder}' not found!")
+            mod_errors += 1
+
+    if mod_errors != 0:
+        return 2
 
     print(f"checked repository: {repo}")
-    return repo
+    return 0
 
 
 # Parse JSON for mod folders in use
@@ -190,34 +200,6 @@ def build(repo, swifty_cli, output):
     repojson = get_swifty_json(repo)
     modfolders, dlcs = parse_swifty_json(repojson)
 
-    # Move optionals
-    print("move optionals")
-    os.makedirs(OPTIONAL_FOLDER, exist_ok=True)
-
-    for optionals_type in ("optionals", "compats"):
-        for optionals_dir in Path(MODS_FOLDER).glob(f"*/@*/{optionals_type}"):
-
-            for optional in optionals_dir.glob("@*"):
-                target = Path(OPTIONAL_FOLDER) / optional.name
-                if target.exists():
-                    shutil.rmtree(target)
-                print(f"  {optional} -> {target}")
-                os.rename(optional, target)
-
-            print(f"  remove '{optionals_dir}'")
-            shutil.rmtree(optionals_dir)
-
-    # Check all mods exist
-    print("check mod list")
-    mod_errors = 0
-    for modfolder, modpath in modfolders.items():
-        if not (modpath / modfolder).exists():
-            print(f"error: mod folder '{modpath / modfolder}' not found!")
-            mod_errors += 1
-
-    if mod_errors != 0:
-        return 1
-
     # Prepare build folder
     if build.exists():
         print(f"remove old build '{build}'")
@@ -336,6 +318,24 @@ def build(repo, swifty_cli, output):
     return 0
 
 
+def move_optionals():
+    print("move optionals")
+    os.makedirs(OPTIONAL_FOLDER, exist_ok=True)
+
+    for optionals_type in ("optionals", "compats"):
+        for optionals_dir in Path(MODS_FOLDER).glob(f"*/@*/{optionals_type}"):
+
+            for optional in optionals_dir.glob("@*"):
+                target = Path(OPTIONAL_FOLDER) / optional.name
+                if target.exists():
+                    shutil.rmtree(target)
+                print(f"  {optional} -> {target}")
+                os.rename(optional, target)
+
+            print(f"  remove '{optionals_dir}'")
+            shutil.rmtree(optionals_dir)
+
+
 def main():
     min_python = (3, 9)
     if sys.version_info < min_python:
@@ -353,12 +353,14 @@ def main():
     if args.publish is not None:
         return publish(args.publish)
 
+    move_optionals()
+
     if not args.repo:
         parser.error("no repositories given")
 
     for repo in args.repo:
-        if not check_swifty_json(repo):
-            parser.error(f"invalid repository '{repo}' - no '{get_swifty_json(repo)}' found")
+        if check_swifty_json(repo) != 0:
+            print(f"error: invalid repository '{repo}'")
             return 1
 
     if not args.swifty.exists():
