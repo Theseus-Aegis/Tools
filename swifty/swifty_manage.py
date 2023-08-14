@@ -209,6 +209,8 @@ def publish(path):
             params.write(data)
             params.truncate()
 
+        print(f"  '{repojson}' -> '{paramspath}'")
+
     return 0
 
 
