@@ -346,37 +346,41 @@ def main():
     parser.add_argument("repo", type=str, nargs="*", help="names of the repositories to operate on")
     parser.add_argument("-p", "--publish", type=Path, nargs="?", const=PUBLISH_PATH, help="publish the available builds")
     parser.add_argument("-o", "--output", type=Path, default=OUTPUT_FILE, help="output file")
+    parser.add_argument("--only-optional", action="store_true", help="only move optionals")
     parser.add_argument("--swifty", type=Path, default=SWIFTY_CLI,
                         help="path to swifty-cli.exe (default: <this-file>/swifty-cli.exe)")
     args = parser.parse_args()
 
-    if args.publish is not None:
-        return publish(args.publish)
+    if args.repo:
+        if not args.swifty.exists():
+            parser.error(f"invalid swifty location '{args.swifty}'")
 
-    move_optionals()
-
-    if not args.repo:
-        parser.error("no repositories given")
-
-    for repo in args.repo:
-        if check_swifty_json(repo) != 0:
-            print(f"error: invalid repository '{repo}'")
+        if not can_make_symlinks():
+            print("error: cannot create symlinks - run as admin!")
             return 1
 
-    if not args.swifty.exists():
-        parser.error(f"invalid swifty location '{args.swifty}'")
+        move_optionals()
 
-    if not can_make_symlinks():
-        print("error: cannot create symlinks - run as admin!")
-        return 1
+        for repo in args.repo:
+            if check_swifty_json(repo) != 0:
+                print(f"error: invalid repository '{repo}'")
+                return 1
 
-    args.output.open("w", encoding="utf-8")
+        args.output.open("w", encoding="utf-8")
 
-    success = 0
-    for repo in args.repo:
-        success = build(repo, args.swifty, args.output)
-        if success != 0:
-            return success
+        success = 0
+        for repo in args.repo:
+            success = build(repo, args.swifty, args.output)
+            if success != 0:
+                return success
+    elif args.only_optional:
+        move_optionals()
+        return 0
+    elif args.publish is None:
+        parser.error("no repositories given")
+
+    if args.publish is not None:
+        return publish(args.publish)
 
     return 0
 
