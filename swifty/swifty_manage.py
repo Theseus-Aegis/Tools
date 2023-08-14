@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 
 MODS_FOLDER = "mods"
+OPTIONAL_FOLDER = "mods/optional"
 KEYS_GLOBAL_FOLDER = MODS_FOLDER
 KEYS_DLC_FOLDER = "mods/keys"
 BUILD_FOLDER = "build"
@@ -62,7 +63,7 @@ def parse_swifty_json(repojson):
         data = json.load(repodata)
 
         # Mods
-        mods = data["requiredMods"] + data["optionalMods"]
+        mods = data.get("requiredMods", []) + data.get("optionalMods", [])
         for mod in mods:
             enabled = mod.get("enabled", True) and mod.get("Enabled", True)
             modpath = Path(MODS_FOLDER, mod["modName"])
@@ -84,7 +85,7 @@ def parse_swifty_json(repojson):
                 modfolders[modpath.name] = modpath.parent
 
         # DLCs
-        for dlc in data["requiredDLCS"]:
+        for dlc in data.get("requiredDLCS", []):
             if dlc != "":
                 print(f"  {dlc} (dlc)")
                 dlcs.append(dlc)
@@ -188,6 +189,23 @@ def build(repo, swifty_cli, output):
     build = Path(BUILD_FOLDER, repo)
     repojson = get_swifty_json(repo)
     modfolders, dlcs = parse_swifty_json(repojson)
+
+    # Move optionals
+    print("move optionals")
+    os.makedirs(OPTIONAL_FOLDER, exist_ok=True)
+
+    for optionals_type in ("optionals", "compats"):
+        for optionals_dir in Path(MODS_FOLDER).glob(f"*/@*/{optionals_type}"):
+
+            for optional in optionals_dir.glob("@*"):
+                target = Path(OPTIONAL_FOLDER) / optional.name
+                if target.exists():
+                    shutil.rmtree(target)
+                print(f"  {optional} -> {target}")
+                os.rename(optional, target)
+
+            print(f"  remove '{optionals_dir}'")
+            shutil.rmtree(optionals_dir)
 
     # Prepare build folder
     if build.exists():
