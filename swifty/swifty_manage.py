@@ -5,12 +5,14 @@ import ctypes
 import filecmp
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 MODS_FOLDER = "mods"
+OPTIONAL_FOLDER = "mods/optional"
 KEYS_GLOBAL_FOLDER = MODS_FOLDER
 KEYS_DLC_FOLDER = "mods/keys"
 BUILD_FOLDER = "build"
@@ -19,7 +21,8 @@ PRELOAD_MODS = ["@cba_a3", "@ace", "@tac_mods"]
 ALWAYS_COPY = ["server"]
 
 SWIFTY_CLI = Path(__file__).resolve().parent / "swifty-cli.exe"
-OUTPUT_FILE = f"{os.path.splitext(__file__)[0]}_cfg.log"
+INT_FILE = Path(f"{os.path.splitext(__file__)[0]}.intermediate")
+# OUTPUT_FILE = f"{os.path.splitext(__file__)[0]}.log" # TODO Change to logger with stdout and file output
 
 
 def can_make_symlinks():
@@ -40,16 +43,32 @@ def get_swifty_json(repo):
     return Path(f"{repo}.json")
 
 
-# Check existence of JSON configuration files
+# Check existence of JSON configuration files and presence of the mods
 def check_swifty_json(repo):
     repojson = get_swifty_json(repo)
 
     if not repojson.exists():
         print(f"error: repository file '{repojson}' does not exist!")
-        return ""
+        return 1
+
+    print("check mod list")
+    mod_errors = 0
+    for modfolder, modpath in parse_swifty_json(repojson)[0].items():
+        if not (modpath / modfolder).exists():
+            print(f"error: mod folder '{modpath / modfolder}' not found!")
+            mod_errors += 1
+
+    if mod_errors != 0:
+        return 2
 
     print(f"checked repository: {repo}")
-    return repo
+    return 0
+
+
+def get_swifty_json_field(repojson, field):
+    with open(repojson, "r", encoding="utf-8") as repodata:
+        data = json.load(repodata)
+        return data.get(field, None)
 
 
 # Parse JSON for mod folders in use
@@ -62,7 +81,7 @@ def parse_swifty_json(repojson):
         data = json.load(repodata)
 
         # Mods
-        mods = data["requiredMods"] + data["optionalMods"]
+        mods = data.get("requiredMods", []) + data.get("optionalMods", [])
         for mod in mods:
             enabled = mod.get("enabled", True) and mod.get("Enabled", True)
             modpath = Path(MODS_FOLDER, mod["modName"])
@@ -84,7 +103,7 @@ def parse_swifty_json(repojson):
                 modfolders[modpath.name] = modpath.parent
 
         # DLCs
-        for dlc in data["requiredDLCS"]:
+        for dlc in data.get("requiredDLCS", []):
             if dlc != "":
                 print(f"  {dlc} (dlc)")
                 dlcs.append(dlc)
@@ -164,10 +183,38 @@ def publish(path):
         # Copy with preserving symlinks - must happen after symlinked copying mods, so they get correctly referenced!
         shutil.copytree(build_repo, publish_build_repo, symlinks=True)
 
+    # Update params.cfg
+    print("update params")
+    if not INT_FILE.exists():
+        print(f"error: intermediate file '{INT_FILE}' not found - rebuild required!")
+        return 1
+
+    for line in INT_FILE.open("r", encoding="utf-8").readlines():
+        repo, modline = line.split()
+        repojson = get_swifty_json(repo)
+
+        if not repojson.exists():
+            print(f"error: '{repojson}' not found - intermediate file likely tampered with!")
+            continue
+
+        paramspath = Path(get_swifty_json_field(repojson, "tac_paramsPath"))
+        if not paramspath.exists():
+            print(f"warning: '{paramspath}' not found - skipping update!")
+            continue
+
+        with open(paramspath, "r+", encoding="utf-8") as params:
+            data = params.read()
+            params.seek(0)
+            data = re.sub(r"-mod=.*", modline, data)
+            params.write(data)
+            params.truncate()
+
+        print(f"  '{repojson}' -> '{paramspath}'")
+
     return 0
 
 
-def build(repo, swifty_cli, output):
+def build(repo, swifty_cli):
     print(f"repository: {repo}")
 
     # Lower-case all mod folders, their 'addons' and PBO files
@@ -226,12 +273,12 @@ def build(repo, swifty_cli, output):
         return 2
 
     # Check the list of mods and prioritize preload mods
-    print("check mod list")
+    print("check build list")
     mods = [""] * len(PRELOAD_MODS)
     mod_errors = 0
     for mod in build.glob("@*"):
         if mod.name not in modfolders:
-            print(f"error: mod folder for '{mod.name}' not found!")
+            print(f"error: mod folder for '{mod.name}' not in mod list!")
             mod_errors += 1
 
         if mod.name in PRELOAD_MODS:
@@ -299,12 +346,29 @@ def build(repo, swifty_cli, output):
     if key_errors != 0:
         return 4
 
-    # Report and log config
-    modline = f"{repo} modline:\n  -mod={modline}\n"
-    print(modline)
-    output.open("a", encoding="utf-8").write(modline)
+    # Report and save modline
+    print(f"{repo}:\n  -mod={modline}\n")
+    INT_FILE.open("a", encoding="utf-8").write(f"{repo} -mod={modline}\n")
 
     return 0
+
+
+def move_optionals():
+    print("move optionals")
+    os.makedirs(OPTIONAL_FOLDER, exist_ok=True)
+
+    for optionals_type in ("optionals", "compats"):
+        for optionals_dir in Path(MODS_FOLDER).glob(f"*/@*/{optionals_type}"):
+
+            for optional in optionals_dir.glob("@*"):
+                target = Path(OPTIONAL_FOLDER) / optional.name
+                if target.exists():
+                    shutil.rmtree(target)
+                print(f"  {optional} -> {target}")
+                os.rename(optional, target)
+
+            print(f"  remove '{optionals_dir}'")
+            shutil.rmtree(optionals_dir)
 
 
 def main():
@@ -316,36 +380,41 @@ def main():
     parser = argparse.ArgumentParser(description="Swifty Modpack Manager")
     parser.add_argument("repo", type=str, nargs="*", help="names of the repositories to operate on")
     parser.add_argument("-p", "--publish", type=Path, nargs="?", const=PUBLISH_PATH, help="publish the available builds")
-    parser.add_argument("-o", "--output", type=Path, default=OUTPUT_FILE, help="output file")
+    parser.add_argument("--only-optional", action="store_true", help="only move optionals")
     parser.add_argument("--swifty", type=Path, default=SWIFTY_CLI,
                         help="path to swifty-cli.exe (default: <this-file>/swifty-cli.exe)")
     args = parser.parse_args()
 
-    if args.publish is not None:
-        return publish(args.publish)
+    if args.repo:
+        if not args.swifty.exists():
+            parser.error(f"invalid swifty location '{args.swifty}'")
 
-    if not args.repo:
-        parser.error("no repositories given")
-
-    for repo in args.repo:
-        if not check_swifty_json(repo):
-            parser.error(f"invalid repository '{repo}' - no '{get_swifty_json(repo)}' found")
+        if not can_make_symlinks():
+            print("error: cannot create symlinks - run as admin!")
             return 1
 
-    if not args.swifty.exists():
-        parser.error(f"invalid swifty location '{args.swifty}'")
+        move_optionals()
 
-    if not can_make_symlinks():
-        print("error: cannot create symlinks - run as admin!")
-        return 1
+        for repo in args.repo:
+            if check_swifty_json(repo) != 0:
+                print(f"error: invalid repository '{repo}'")
+                return 1
 
-    args.output.open("w", encoding="utf-8")
+        INT_FILE.open("w", encoding="utf-8")
 
-    success = 0
-    for repo in args.repo:
-        success = build(repo, args.swifty, args.output)
-        if success != 0:
-            return success
+        success = 0
+        for repo in args.repo:
+            success = build(repo, args.swifty)
+            if success != 0:
+                return success
+    elif args.only_optional:
+        move_optionals()
+        return 0
+    elif args.publish is None:
+        parser.error("no repositories given")
+
+    if args.publish is not None:
+        return publish(args.publish)
 
     return 0
 
