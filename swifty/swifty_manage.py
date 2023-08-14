@@ -218,8 +218,6 @@ def build(repo, swifty_cli, output):
     if mod_errors != 0:
         return 1
 
-    return 0
-
     # Prepare build folder
     if build.exists():
         print(f"remove old build '{build}'")
