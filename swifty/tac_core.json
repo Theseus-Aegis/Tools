@@ -10,5 +10,8 @@
   "optionalMods": [],
   "clientParameters": "-nosplash -skipIntro",
   "servers": [],
-  "tac_paramsPath": "mods/params.cfg"
+  "tac_paramsPaths": [
+    "mods/params.cfg",
+    "mods/params2.cfg"
+  ]
 }

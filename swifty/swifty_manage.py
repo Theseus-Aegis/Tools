@@ -197,19 +197,21 @@ def publish(path):
             print(f"error: '{repojson}' not found - intermediate file likely tampered with!")
             continue
 
-        paramspath = Path(get_swifty_json_field(repojson, "tac_paramsPath"))
-        if not paramspath.exists():
-            print(f"warning: '{paramspath}' not found - skipping update!")
-            continue
+        paramspaths = get_swifty_json_field(repojson, "tac_paramsPaths")
+        for params in paramspaths:
+            params = Path(params)
+            if not params.exists():
+                print(f"  warning: '{params}' not found - skipping update!")
+                continue
 
-        with open(paramspath, "r+", encoding="utf-8") as params:
-            data = params.read()
-            params.seek(0)
-            data = re.sub(r"-mod=.*", modline, data)
-            params.write(data)
-            params.truncate()
+            with open(params, "r+", encoding="utf-8") as f:
+                data = f.read()
+                f.seek(0)
+                data = re.sub(r"-mod=.*", modline, data)
+                f.write(data)
+                f.truncate()
 
-        print(f"  '{repojson}' -> '{paramspath}'")
+            print(f"  {repo} -> '{params}'")
 
     return 0
 
