@@ -19,7 +19,7 @@ protobuf==3.18.3
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.21
-PyDrive2==1.10.0
+PyDrive2==1.16.2
 pyOpenSSL==21.0.0
 pyparsing==2.4.7
 pytz==2021.1
