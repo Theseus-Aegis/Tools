@@ -1,6 +1,7 @@
 /*
  * Author: Jonpas
  * Retrieves compatible items of all weapons (primary, secondary, handgun, binoculars) and pastes the data to clipboard.
+ * It is faster to call this as a function rather than spawn it, but it is laggy.
  * Requires: CBA A3
  *
  * Arguments:
@@ -50,7 +51,7 @@ private _data = []; // [ weapon, [items], weapon, [items], ... ]
         "isClass _x &&" +
         "{getNumber (_x >> 'type') in [1, 2, 4, 2^12]} && " + // Only primary (1), handguns (2), secondaries (4) and binoculars (4096)
         "{getNumber (_x >> 'scope') == 2} && " + // Only scope 2 (public) weapons
-        "{!isClass (_x >> 'LinkedItems')}", // Exclude linked items (weapons with preset attachments)",
+        "{!isClass (_x >> 'LinkedItems') || {count (_x >> 'LinkedItems') == 0}}", // Exclude linked items (weapons with preset attachments) or empty linkedItems class
         true
     ]
 );
