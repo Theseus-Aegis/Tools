@@ -171,15 +171,14 @@ def publish(path):
                 shutil.rmtree(x)
 
     # Clean copy built repos
-    removed = []
-    for publish_build_repo in publish_build.iterdir():
-        shutil.rmtree(publish_build_repo)
-        removed.append(publish_build_repo)
-
     print("copy build")
     for build_repo in build.iterdir():
         publish_build_repo = publish_build / build_repo.name
-        print(f"  '{build_repo}' -> '{publish_build_repo}' {'(clean)' if publish_build_repo in removed else '(new)'}")
+        if publish_build_repo.exists():
+            shutil.rmtree(publish_build_repo)
+            print(f"  '{build_repo}' -> '{publish_build_repo} (clean)")
+        else:
+            print(f"  '{build_repo}' -> '{publish_build_repo} (new)")
         # Copy with preserving symlinks - must happen after symlinked copying mods, so they get correctly referenced!
         shutil.copytree(build_repo, publish_build_repo, symlinks=True)
 
